@@ -4,7 +4,7 @@ class Host
     constructor(ns, hostname)
     {
         this.name = hostname;
-        this.cores = hostname === "home" ? 2 : 1; // update this when upgrading cores
+        this.cores = hostname === "home" ? 6 : 1; // update this when upgrading cores
         this.maxRam = hostname === "home" ? Math.floor(ns.getServerMaxRam(hostname) * 0.9) : ns.getServerMaxRam(hostname);
         this.usedRam = ns.getServerUsedRam(hostname);
         this.maxMoney = ns.getServerMaxMoney(hostname);
@@ -22,6 +22,7 @@ class Host
 
     update()
     {
+        let timer_start = Date.now();
         this.usedRam = this.ns.getServerUsedRam(this.name);
         this.currentAvailableRam = this.maxRam - this.usedRam;
         this.currentMoney = this.ns.getServerMoneyAvailable(this.name);
@@ -30,10 +31,11 @@ class Host
         this.hackChance = this.ns.formulas.hacking.hackChance(this.name, this.ns.getPlayer());
         this.growTime = this.ns.formulas.hacking.growTime(this.name, this.ns.getPlayer());
         this.growPercent = this.ns.formulas.hacking.growPercent(this.ns.getServer(this.name), 1, this.ns.getPlayer(), 1);
-        this.weakenTime = this.ns.formulas.hacking.weakenTime(this.name, this.ns.getPlayer());
+        this.weakenTime = this.ns.formulas.hacking.weakenTime(this.ns.getServer(this.name), this.ns.getPlayer());
         this.hackTime = this.ns.formulas.hacking.hackTime(this.name, this.ns.getPlayer());
         this.hackPercent = this.ns.formulas.hacking.hackPercent(this.ns.getServer(this.name), this.ns.getPlayer());
         this.hasRootAccess = this.ns.hasRootAccess(this.name);
+        let timer_end = Date.now();
     }
 
     async exec(cmd, threads, args)
@@ -60,7 +62,11 @@ class Host
         }
         else
         {
+            let timer_exec_start = Date.now();
             await this.exec(task.script, factor, task.args);
+            let timer_exec_end = Date.now();
+            let timer_exec_duration = timer_exec_end - timer_exec_start;
+            await this.ns.write("log.txt", `===>${this.name} executed ${task.script} with args ${task.args} in ${timer_exec_duration}ms\n`, "a'");
         }
     }
 
