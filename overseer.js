@@ -95,6 +95,7 @@ async function generate_batch(ns, host, prep = false)
 
 export async function main(ns)
 {
+    lib.init(ns);
     // Get the list of hosts in the network
     let all_hosts = [];
     await lib.recurse_scan(ns, "home", all_hosts, [lib.try_nuke]);
@@ -114,7 +115,7 @@ export async function main(ns)
     //  * that are on the target blacklist
 
     // Filter out the targets that are on the target blacklist
-    let targets = all_hosts.filter(function (host) { return lib.target_blacklist.indexOf(host.name) === -1; });
+    let targets = all_hosts.filter(function (host) { return lib.own_servers.indexOf(host.name) === -1; });
 
     // Filter out the targets that we do not have enough hacking level to hack
     targets = targets.filter(function (host) { return host.canHack });
@@ -203,7 +204,7 @@ export async function main(ns)
             let batch = await generate_batch(ns, target);
             let batch_timer_end = Date.now();
             batch_timer += batch_timer_end - batch_timer_start;
-            if (manager.get_available_ram() >= batch.cost)
+            if (await manager.get_available_ram() >= batch.cost)
             {
                 let assign_timer_start = Date.now();
                 let totalPowerAllocated = await manager.assign(batch);
@@ -214,7 +215,7 @@ export async function main(ns)
             }
             else
             {
-                await ns.tprint(`Could not assign enough power to ${target.name} (${manager.get_available_ram()}/${batch.cost})\n`);
+                await ns.tprint(`Could not assign enough power to ${target.name} (${await manager.get_available_ram()}/${batch.cost})\n`);
             }
             await ns.sleep(1);
         }
