@@ -6,6 +6,7 @@ import * as lib from "./lib.js";
 
 export async function main(ns)
 {
+    lib.init(ns);
     const ramCost = await ns.getScriptRam(ns.args[0]);
     let total = 0;
     for (let host of lib.own_servers)
@@ -31,5 +32,5 @@ export async function main(ns)
             await ns.tprint(`Error installing ${ns.args[0]} on ${host}: ${e}`);
         }
     }
-    await ns.tprint(`${ns.args[0]} runned on ${total} threads`);
+    await ns.tprint(`${ns.args[0]} ran on ${total} threads`);
 }
