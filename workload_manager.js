@@ -3,10 +3,10 @@ import * as lib from "./lib.js";
 export class Task
 {
     /**
-     * @param {*} ns 
-     * @param {*} script The script to run
-     * @param {*} canRunOnHome Whether the script can run on the home server. This is mostly used to filter out scripts that do not benefit from multiple cores.
-     * @param {*} powerNeeded The amount of power with which to run the script. This is equivalent to threads * cores
+     * @param {NS} ns
+     * @param {string} script The script to run
+     * @param {bool} canRunOnHome Whether the script can run on the home server. This is mostly used to filter out scripts that do not benefit from multiple cores.
+     * @param {int} powerNeeded The amount of power with which to run the script. This is equivalent to threads * cores
      * @param  {...any} args The arguments to pass to the script
      */
     constructor(ns, script, canRunOnHome, powerNeeded, ...args)
@@ -34,7 +34,7 @@ export class Task
 
 export class Batch extends Task
 {
-    constructor(ns, tasks)
+    constructor(ns, tasks = [])
     {
         super(ns);
         this.tasks = tasks;
@@ -48,44 +48,99 @@ export class Batch extends Task
     add(task)
     {
         this.tasks.push(task);
-        this.cost += task.cost;
+        this.cost += task.cost * task.powerNeeded;
     }
 }
 
+export class Node extends lib.Host
+{
+    constructor(ns, name)
+    {
+        super(ns, name);
+    }
+
+    async run(task, factor = 1)
+    {
+        if (factor < 1)
+        {
+            return;
+        }
+        if (task.tasks != null)
+        {
+            for (let t of task.tasks)
+            {
+                await this.run(t, factor);
+            }
+        }
+        else
+        {
+            await this.exec(task.script, factor, task.args);
+        }
+    }
+
+    async fill(task)
+    {
+        let concurrent = this.currentAvailableRam / task.cost;
+        concurrent = Math.floor(concurrent);
+        await this.run(task, concurrent);
+        return concurrent * this.cores;
+    }
+
+    /**
+     * @param {Task} task 
+     * @returns The amount of power the node can potentially run the task with
+     */
+    satisfaction(task)
+    {
+        let concurrent = this.currentAvailableRam / task.cost;
+        concurrent = Math.floor(concurrent) * this.cores;
+        if (concurrent > task.powerNeeded)
+        {
+            concurrent = task.powerNeeded;
+        }
+        return concurrent;
+    }
+}
 
 export class WorkloadManager
 {
     /**
-     * @param {*} ns
-     * @param {Host} nodes
+     * @param {NS} ns
+     * @param {Array<Node>} nodes
      */
     constructor(ns, nodes = [])
     {
         this.ns = ns;
         this.nodes = nodes;
-        this.tasks = [];
-        this.scripts = [];
         this.totalAvailableRam = 0;
         this.currentAvailableRam = 0;
         this.execs = 0;
-        for (let node of this.nodes)
-        {
-            this.totalAvailableRam += node.maxRam;
-            this.currentAvailableRam += node.currentAvailableRam;
-        }
+        this.update();
     }
 
     /**
-     * Update the current available RAM and every node state
+     * Update the current available RAM and every node state. Expensive!
      */
     async update()
     {
         this.currentAvailableRam = 0;
+        this.totalAvailableRam = 0;
         for (let node of this.nodes)
         {
             node.update();
             this.currentAvailableRam += node.currentAvailableRam;
+            this.totalAvailableRam += node.maxRam;
         }
+    }
+
+    /**
+     * Add a node to the network.
+     * @param {Node} node
+     */
+    async add_node(node)
+    {
+        this.nodes.push(node);
+        await this.update();
     }
 
     /**
@@ -148,7 +203,7 @@ export class WorkloadManager
             }
             if (node === null) // No node available, too bad
             {
-                return allocated_power;
+                return totalPowerAllocated;
             }
             node.executions = this.execs; // This is used as a unique identifier for the task, so that multiple tasks with the same arguments can be executed on the same node
             if (fill)
@@ -158,15 +213,11 @@ export class WorkloadManager
             else
             {
                 // let t be the number of power a node can allocate to the task
-                let t = node.satisfaction(task);
-                let threads = Math.min(task.powerNeeded, t);
-                threads = Math.ceil(threads);
-                if (threads < 1)
-                    threads = 1;
+                let threads = node.satisfaction(task)
                 await node.run(task, threads);
                 allocated_power += threads;
             }
-            node.update();
+            await node.update();
             this.currentAvailableRam -= task.cost; // save some time by not updating the network state; maybe risky?
             task.powerNeeded -= allocated_power;
             totalPowerAllocated += allocated_power;
@@ -210,6 +261,12 @@ export class WorkloadManager
     {
         await this.update();
         return this.currentAvailableRam;
+    }
+
+    async get_total_ram()
+    {
+        await this.update();
+        return this.totalAvailableRam;
     }
 
     /**

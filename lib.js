@@ -8,7 +8,7 @@ export function init(ns)
     own_servers = ns.getPurchasedServers();
 }
 
-class Host
+export class Host
 {
     constructor(ns, hostname)
     {
@@ -53,44 +53,6 @@ class Host
         await this.ns.scp(cmd, this.name);
         await this.ns.exec(cmd, this.name, threads, ...args, this.executions);
         this.update();
-    }
-
-    async run(task, factor = 1)
-    {
-        if (factor < 1)
-        {
-            return;
-        }
-        if (task.tasks != null)
-        {
-            for (let t of task.tasks)
-            {
-                await this.run(t, factor);
-            }
-        }
-        else
-        {
-            await this.exec(task.script, factor, task.args);
-        }
-    }
-
-    async fill(task)
-    {
-        let concurrent = this.currentAvailableRam / task.cost;
-        concurrent = Math.floor(concurrent);
-        await this.run(task, concurrent);
-        return concurrent * this.cores;
-    }
-
-    /**
-     * @param {*} task 
-     * @returns The amount of power the node can potentially run the task with
-     */
-    satisfaction(task)
-    {
-        let concurrent = this.currentAvailableRam / task.cost;
-        concurrent = Math.floor(concurrent);
-        return concurrent * this.cores;
     }
 
     killall()

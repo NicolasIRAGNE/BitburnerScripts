@@ -9,8 +9,8 @@ import * as wm from "./workload_manager.js";
 /**
  * Generate a batch that will steal hackTarget of a target's money then grow it back to its original money and security
  * This function assumes that the target current security is at its minimum and current money is at its maximum
- * @param {*} ns 
- * @param {*} host 
+ * @param {NS} ns 
+ * @param {lib.Host} host 
  */
 async function generate_batch(ns, host, prep = false)
 {
