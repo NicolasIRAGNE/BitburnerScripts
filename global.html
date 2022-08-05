@@ -2,22 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Global</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Global - Documentation</title>
 
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
     <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
 </head>
-
 <body>
 
-<div id="main">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
 
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Task_Task.html">Task</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="WorkloadManager_WorkloadManager.html">WorkloadManager</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#generate_batch">generate_batch</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#multiscan">multiscan</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#recurse_scan">recurse_scan</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#recurse_scan_legacy">recurse_scan_legacy</a></span></li>
+</nav>
+
+<div id="main">
+    
     <h1 class="page-title">Global</h1>
+    
 
     
 
@@ -28,7 +41,9 @@
 
 <header>
     
-        <h2></h2>
+        <h2>
+        
+        </h2>
         
     
 </header>
@@ -87,9 +102,7 @@
 
     
 
-    
-
-    
+     
 
     
 
@@ -100,12 +113,11 @@
 
         
             
+<div class="section-method">
 
     
 
-    
     <h4 class="name" id="generate_batch"><span class="type-signature">(async) </span>generate_batch<span class="signature">(ns, host)</span><span class="type-signature"></span></h4>
-    
 
     
 
@@ -115,86 +127,6 @@
     Generate a batch that will steal hackTarget of a target's money then grow it back to its original money and security
 This function assumes that the target current security is at its minimum and current money is at its maximum
 </div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>ns</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">NS</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>host</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">lib.Host</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
 
 
 
@@ -248,38 +180,6 @@ This function assumes that the target current security is at its minimum and cur
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="multiscan"><span class="type-signature"></span>multiscan<span class="signature">(ns)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
     <h5>Parameters:</h5>
     
 
@@ -311,7 +211,7 @@ This function assumes that the target current security is at its minimum and cur
             <td class="type">
             
                 
-<span class="param-type">NS</span>
+<span class="param-type"><code>NS</code></span>
 
 
             
@@ -321,12 +221,68 @@ This function assumes that the target current security is at its minimum and cur
 
             
 
-            <td class="description last"></td>
+            <td class="description last">
+                
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>host</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>lib.Host</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                
+                
+            </td>
         </tr>
 
     
     </tbody>
 </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="multiscan"><span class="type-signature"></span>multiscan<span class="signature">(ns)</span><span class="type-signature"></span></h4>
+
+    
+
 
 
 
@@ -381,42 +337,6 @@ This function assumes that the target current security is at its minimum and cur
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="recurse_scan"><span class="type-signature"></span>recurse_scan<span class="signature">(ns, hostname, hosts, func, depth)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Recursively scan hostnames
-</div>
-
-
-
-
-
-
-
-
-
     <h5>Parameters:</h5>
     
 
@@ -448,7 +368,7 @@ This function assumes that the target current security is at its minimum and cur
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type"><code>NS</code></span>
 
 
             
@@ -458,105 +378,47 @@ This function assumes that the target current security is at its minimum and cur
 
             
 
-            <td class="description last">NetScript instance. Mandatory.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>hostname</code></td>
-            
-
-            <td class="type">
-            
+            <td class="description last">
                 
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The hostname to use as starting point</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>hosts</code></td>
-            
-
-            <td class="type">
-            
                 
-<span class="param-type">*</span>
-
-
-            
             </td>
-
-            
-
-            
-
-            <td class="description last">Array of Host objects</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>func</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The function to call for each hostname</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>depth</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The depth of the scan. This should be set to 0 when calling this function.</td>
         </tr>
 
     
     </tbody>
 </table>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="recurse_scan"><span class="type-signature"></span>recurse_scan<span class="signature">(ns, hostname, hosts, func, depth)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Recursively scan hostnames
+</div>
 
 
 
@@ -610,42 +472,6 @@ This function assumes that the target current security is at its minimum and cur
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="recurse_scan_legacy"><span class="type-signature"></span>recurse_scan_legacy<span class="signature">(ns, hostname, hosts, func, depth)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Recursively scan hostnames. This is kept for legacy reasons.
-</div>
-
-
-
-
-
-
-
-
-
     <h5>Parameters:</h5>
     
 
@@ -677,7 +503,7 @@ This function assumes that the target current security is at its minimum and cur
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type"><code>*</code></span>
 
 
             
@@ -687,7 +513,10 @@ This function assumes that the target current security is at its minimum and cur
 
             
 
-            <td class="description last">NetScript instance. Mandatory.</td>
+            <td class="description last">
+                NetScript instance. Mandatory.
+                
+            </td>
         </tr>
 
     
@@ -700,7 +529,7 @@ This function assumes that the target current security is at its minimum and cur
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type"><code>*</code></span>
 
 
             
@@ -710,7 +539,10 @@ This function assumes that the target current security is at its minimum and cur
 
             
 
-            <td class="description last">The hostname to use as starting point</td>
+            <td class="description last">
+                The hostname to use as starting point
+                
+            </td>
         </tr>
 
     
@@ -723,7 +555,7 @@ This function assumes that the target current security is at its minimum and cur
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type"><code>*</code></span>
 
 
             
@@ -733,7 +565,10 @@ This function assumes that the target current security is at its minimum and cur
 
             
 
-            <td class="description last">Array of *strings* of hostnames</td>
+            <td class="description last">
+                Array of Host objects
+                
+            </td>
         </tr>
 
     
@@ -746,7 +581,7 @@ This function assumes that the target current security is at its minimum and cur
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type"><code>*</code></span>
 
 
             
@@ -756,7 +591,10 @@ This function assumes that the target current security is at its minimum and cur
 
             
 
-            <td class="description last">The function to call for each hostname</td>
+            <td class="description last">
+                The function to call for each hostname
+                
+            </td>
         </tr>
 
     
@@ -769,7 +607,7 @@ This function assumes that the target current security is at its minimum and cur
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type"><code>*</code></span>
 
 
             
@@ -779,13 +617,47 @@ This function assumes that the target current security is at its minimum and cur
 
             
 
-            <td class="description last">The depth of the scan. This should be set to 0 when calling this function.</td>
+            <td class="description last">
+                The depth of the scan. This should be set to 0 when calling this function.
+                
+            </td>
         </tr>
 
     
     </tbody>
 </table>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="recurse_scan_legacy"><span class="type-signature"></span>recurse_scan_legacy<span class="signature">(ns, hostname, hosts, func, depth)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Recursively scan hostnames. This is kept for legacy reasons.
+</div>
 
 
 
@@ -839,6 +711,160 @@ This function assumes that the target current security is at its minimum and cur
 
 
 
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ns</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>*</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                NetScript instance. Mandatory.
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>hostname</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>*</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                The hostname to use as starting point
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>hosts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>*</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                Array of *strings* of hostnames
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>func</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>*</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                The function to call for each hostname
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>depth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>*</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                The depth of the scan. This should be set to 0 when calling this function.
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -850,6 +876,12 @@ This function assumes that the target current security is at its minimum and cur
 
 
 
+
+
+
+
+
+</div>
         
     
 
@@ -865,17 +897,13 @@ This function assumes that the target current security is at its minimum and cur
 
 </div>
 
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Task_Task.html">Task</a></li><li><a href="WorkloadManager_WorkloadManager.html">WorkloadManager</a></li></ul><h3>Global</h3><ul><li><a href="global.html#generate_batch">generate_batch</a></li><li><a href="global.html#multiscan">multiscan</a></li><li><a href="global.html#recurse_scan">recurse_scan</a></li><li><a href="global.html#recurse_scan_legacy">recurse_scan_legacy</a></li></ul>
-</nav>
-
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Aug 05 2022 13:48:42 GMT+0000 (Coordinated Universal Time)
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Fri Aug 05 2022 13:55:40 GMT+0000 (Coordinated Universal Time) using the Minami theme.
 </footer>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
 </body>
 </html>
