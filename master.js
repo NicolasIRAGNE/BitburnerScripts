@@ -51,7 +51,7 @@ export async function main(ns)
         }
         while (usedRam + (ramCost * threads) < maxRam)
         {
-            const target = targets[i % targets.length];
+            const target = targets[i % targets.length].name;
             await ns.tprint(`\tRunning ${growName} ${target} with ${threads} threads... [${usedRam + ramCost * threads}/${maxRam}]`);
             let res = await ns.exec(growName, hostname, 6 * threads, target, i);
             if (res === 0)
@@ -73,7 +73,7 @@ export async function main(ns)
         {
             continue;
         }
-        const target = targets[Math.floor(Math.random() * targets.length)];
+        const target = targets[Math.floor(Math.random() * targets.length)].name;
         let res = await ns.exec(growName, hostname, extraInstalls, target, installs);
         installs += extraInstalls;
         if (res === 0)

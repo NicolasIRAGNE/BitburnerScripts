@@ -9,8 +9,9 @@ export async function main(ns)
     lib.init(ns);
     const ramCost = await ns.getScriptRam(ns.args[0]);
     let total = 0;
-    for (let host of lib.own_servers)
+    for (let server of lib.own_servers)
     {
+        let host = server.name;
         try
         {
             await ns.killall(host);
