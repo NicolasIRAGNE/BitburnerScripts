@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Global - Documentation</title>
+    <title>WorkloadManager - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,7 +29,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Global</h1>
+    <h1 class="page-title">WorkloadManager</h1>
     
 
     
@@ -42,8 +42,11 @@
 <header>
     
         <h2>
-        
+        WorkloadManager
         </h2>
+        
+            <div class="class-description">A WorkloadManager is responsible for assigning tasks to nodes.
+It acts as an interface between the user and the nodes.</div>
         
     
 </header>
@@ -52,8 +55,20 @@
     <div class="container-overview">
     
         
+<div class="section-method">
 
-        
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="WorkloadManager"><span class="type-signature"></span>new WorkloadManager<span class="signature">(ns, nodes)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
 
 
 <dl class="details">
@@ -83,6 +98,11 @@
     
 
     
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_workload_manager.js.html">lib/workload_manager.js</a>, <a href="lib_workload_manager.js.html#line157">line 157</a>
+    </li></ul></dd>
+    
 
     
 
@@ -92,7 +112,106 @@
 </dl>
 
 
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
         
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ns</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>NS</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                The NetScript instance. Mandatory.
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nodes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>Array.&lt;<a href="Node.html">Node</a>></code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                A list of nodes to assign tasks to.
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
     
     </div>
 
@@ -100,6 +219,13 @@
 
     
 
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="WorkloadManager.html">WorkloadManager</a></dt>
+            <dd></dd>
+        </dl>
     
 
      
@@ -117,14 +243,14 @@
 
     
 
-    <h4 class="name" id="expect_eq"><span class="type-signature"></span>expect_eq<span class="signature">(a, b)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="add_node"><span class="type-signature">(async) </span>add_node<span class="signature">(node)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Expects equality between two values.
+    Add a node to the network.
 </div>
 
 
@@ -160,7 +286,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_testing.js.html">lib/testing.js</a>, <a href="lib_testing.js.html#line117">line 117</a>
+        <a href="lib_workload_manager.js.html">lib/workload_manager.js</a>, <a href="lib_workload_manager.js.html#line188">line 188</a>
     </li></ul></dd>
     
 
@@ -204,39 +330,13 @@
 
         <tr>
             
-                <td class="name"><code>a</code></td>
+                <td class="name"><code>node</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><code>*</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                
-                
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>b</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>*</code></span>
+<span class="param-type"><code><a href="Node.html">Node</a></code></span>
 
 
             
@@ -278,15 +378,14 @@
 
     
 
-    <h4 class="name" id="generate_batch"><span class="type-signature">(async) </span>generate_batch<span class="signature">(ns, host)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="assign"><span class="type-signature">(async) </span>assign<span class="signature">(task, fill)</span><span class="type-signature"> &rarr; {number}</span></h4>
 
     
 
 
 
 <div class="description">
-    Generate a batch that will steal hackTarget of a target's money then grow it back to its original money and security
-This function assumes that the target current security is at its minimum and current money is at its maximum
+    Assign a task to be executed. The manager will assign the task to multiple nodes if necessary.
 </div>
 
 
@@ -322,7 +421,381 @@ This function assumes that the target current security is at its minimum and cur
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="overseer.js.html">overseer.js</a>, <a href="overseer.js.html#line15">line 15</a>
+        <a href="lib_workload_manager.js.html">lib/workload_manager.js</a>, <a href="lib_workload_manager.js.html#line223">line 223</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>task</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code><a href="Task.html">Task</a></code></span>
+|
+
+<span class="param-type"><code><a href="Batch.html">Batch</a></code></span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+                The task to be executed. Can be a Batch or a Task.
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fill</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>boolean</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">
+                If true, upon assignment, the entire node RAM will be used to execute the task. This is useful for some misc scripts but it is not recommended for most workloads.
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>number</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    The amount of power that was used to run the task. If this is less than the powerNeeded of the task, the task was not finished. This can also be superior to the powerNeeded of the task if the task does not have the strict_power_allocation flag set.
+</div>
+
+    
+</div>
+
+
+
+</div>
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="fill"><span class="type-signature">(async) </span>fill<span class="signature">(task<span class="signature-attributes">non-null</span>, fill)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Assign a task as many times as possible
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_workload_manager.js.html">lib/workload_manager.js</a>, <a href="lib_workload_manager.js.html#line295">line 295</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>task</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code><a href="Task.html">Task</a></code></span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+                
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fill</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>boolean</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">
+                
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="map"><span class="type-signature">(async) </span>map<span class="signature">(task)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Assign a task to ALL nodes in the network.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_workload_manager.js.html">lib/workload_manager.js</a>, <a href="lib_workload_manager.js.html#line281">line 281</a>
     </li></ul></dd>
     
 
@@ -366,39 +839,13 @@ This function assumes that the target current security is at its minimum and cur
 
         <tr>
             
-                <td class="name"><code>ns</code></td>
+                <td class="name"><code>task</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><code>NS</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                
-                
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>host</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>lib.Host</code></span>
+<span class="param-type"><code><a href="Task.html">Task</a></code></span>
 
 
             
@@ -440,14 +887,14 @@ This function assumes that the target current security is at its minimum and cur
 
     
 
-    <h4 class="name" id="recurse_scan"><span class="type-signature"></span>recurse_scan<span class="signature">(ns, hostname, hosts, funcs, depth)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="summary"><span class="type-signature"></span>summary<span class="signature">(depth)</span><span class="type-signature"> &rarr; {string}</span></h4>
 
     
 
 
 
 <div class="description">
-    Recursively scan hostnames
+    Get a summary of the current state of the network
 </div>
 
 
@@ -483,7 +930,7 @@ This function assumes that the target current security is at its minimum and cur
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_lib.js.html">lib/lib.js</a>, <a href="lib_lib.js.html#line174">line 174</a>
+        <a href="lib_workload_manager.js.html">lib/workload_manager.js</a>, <a href="lib_workload_manager.js.html#line199">line 199</a>
     </li></ul></dd>
     
 
@@ -517,116 +964,14 @@ This function assumes that the target current security is at its minimum and cur
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>ns</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>NS</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                NetScript instance. Mandatory.
-                
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>hostname</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>string</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                The hostname to use as starting point
-                
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>hosts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>Array.&lt;<a href="Host.html">Host</a>></code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                Array of Host objects
-                
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>funcs</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>Array.&lt;function(NS, string)></code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                The function to call for each hostname (called as func(ns, hostname))
-                
-            </td>
-        </tr>
-
     
 
         <tr>
@@ -637,7 +982,7 @@ This function assumes that the target current security is at its minimum and cur
             <td class="type">
             
                 
-<span class="param-type"><code>Number</code></span>
+<span class="param-type"><code>number</code></span>
 
 
             
@@ -646,9 +991,15 @@ This function assumes that the target current security is at its minimum and cur
             
 
             
+                <td class="default">
+                
+                    0
+                
+                </td>
+            
 
             <td class="description last">
-                The depth of the scan. This should be set to 0 when calling this function.
+                If depth is 0, only a brief summary is returned. If depth is 1, all nodes are returned.
                 
             </td>
         </tr>
@@ -670,6 +1021,31 @@ This function assumes that the target current security is at its minimum and cur
 
 
 
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>string</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    A string containing a summary of the current state of the network
+</div>
+
+    
+</div>
+
 
 
 </div>
@@ -679,14 +1055,14 @@ This function assumes that the target current security is at its minimum and cur
 
     
 
-    <h4 class="name" id="recurse_scan_legacy"><span class="type-signature"></span>recurse_scan_legacy<span class="signature">(ns, hostname, hosts, funcs, depth)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="update"><span class="type-signature">(async) </span>update<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Recursively scan hostnames. This is kept for legacy reasons.
+    Update the current available RAM and every node state. Expensive!
 </div>
 
 
@@ -722,7 +1098,7 @@ This function assumes that the target current security is at its minimum and cur
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_lib.js.html">lib/lib.js</a>, <a href="lib_lib.js.html#line212">line 212</a>
+        <a href="lib_workload_manager.js.html">lib/workload_manager.js</a>, <a href="lib_workload_manager.js.html#line172">line 172</a>
     </li></ul></dd>
     
 
@@ -741,160 +1117,87 @@ This function assumes that the target current security is at its minimum and cur
 
 
 
-    <h5>Parameters:</h5>
-    
 
-<table class="params">
-    <thead>
-    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
         
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
             
-                <td class="name"><code>ns</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>NS</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                NetScript instance. Mandatory.
-                
-            </td>
-        </tr>
+<div class="section-method">
 
     
 
-        <tr>
-            
-                <td class="name"><code>hostname</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>string</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                The hostname to use as starting point
-                
-            </td>
-        </tr>
+    <h4 class="name" id="update_network"><span class="type-signature">(async) </span>update_network<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
-        <tr>
-            
-                <td class="name"><code>hosts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>Array.&lt;string></code></span>
 
 
-            
-            </td>
+<div class="description">
+    Regenerate the list of nodes by scanning the network. Should not really use this because it is slow and will overwrite any specific node configuration.
+</div>
 
-            
 
-            
 
-            <td class="description last">
-                Array of *strings* of hostnames
-                
-            </td>
-        </tr>
+
+
+<dl class="details">
 
     
 
-        <tr>
-            
-                <td class="name"><code>funcs</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>Array.&lt;function(NS, string)></code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                The function to call for each hostname (called as func(ns, hostname))
-                
-            </td>
-        </tr>
+    
 
     
 
-        <tr>
-            
-                <td class="name"><code>depth</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>Number</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                The depth of the scan. This should be set to 0 when calling this function.
-                
-            </td>
-        </tr>
+    
 
     
-    </tbody>
-</table>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_workload_manager.js.html">lib/workload_manager.js</a>, <a href="lib_workload_manager.js.html#line325">line 325</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
 
 
 

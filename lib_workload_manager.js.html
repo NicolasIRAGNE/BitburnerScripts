@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>workload_manager.js - Documentation</title>
+    <title>lib/workload_manager.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -24,12 +24,12 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Task_Task.html">Task</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="WorkloadManager_WorkloadManager.html">WorkloadManager</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#generate_batch">generate_batch</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#multiscan">multiscan</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#recurse_scan">recurse_scan</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#recurse_scan_legacy">recurse_scan_legacy</a></span></li>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Batch.html">Batch</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="ExecutionPolicy.html">ExecutionPolicy</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Host.html">Host</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Host.html#repr">repr</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Node.html">Node</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Node.html#fill">fill</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Node.html#run">run</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Node.html#satisfaction">satisfaction</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Task.html">Task</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Task.html#matchesPolicy">matchesPolicy</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="TestSuite.html">TestSuite</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="TestSuite.html#report">report</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="WorkloadManager.html">WorkloadManager</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="WorkloadManager.html#add_node">add_node</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="WorkloadManager.html#assign">assign</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="WorkloadManager.html#fill">fill</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="WorkloadManager.html#map">map</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="WorkloadManager.html#summary">summary</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="WorkloadManager.html#update">update</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="WorkloadManager.html#update_network">update_network</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#expect_eq">expect_eq</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#generate_batch">generate_batch</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#recurse_scan">recurse_scan</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#recurse_scan_legacy">recurse_scan_legacy</a></span></li>
 </nav>
 
 <div id="main">
     
-    <h1 class="page-title">workload_manager.js</h1>
+    <h1 class="page-title">lib/workload_manager.js</h1>
     
 
     
@@ -41,15 +41,28 @@
         <article>
             <pre class="prettyprint source linenums"><code>import * as lib from "./lib.js";
 
+/**
+ * Allows specifying additional constraints on the execution of a task.
+ */
+export class ExecutionPolicy
+{
+    constructor()
+    {
+        this.allowed_types = ~0;
+        this.strict_power_allocation = false;
+    }
+}
+
+/**
+ * A Task represents an operation that can be assigned to a @see Node.
+ * @param {NS} ns
+ * @param {string} script The script to run
+ * @param {bool} canRunOnHome Whether the script can run on the home server. This is mostly used to filter out scripts that do not benefit from multiple cores.
+ * @param {int} powerNeeded The amount of power with which to run the script. This is equivalent to threads * cores
+ * @param  {...any} args The arguments to pass to the script
+ */
 export class Task
 {
-    /**
-     * @param {NS} ns
-     * @param {string} script The script to run
-     * @param {bool} canRunOnHome Whether the script can run on the home server. This is mostly used to filter out scripts that do not benefit from multiple cores.
-     * @param {int} powerNeeded The amount of power with which to run the script. This is equivalent to threads * cores
-     * @param  {...any} args The arguments to pass to the script
-     */
     constructor(ns, script, canRunOnHome, powerNeeded, ...args)
     {
         this.ns = ns;
@@ -71,8 +84,24 @@ export class Task
     {
         return `${this.script} ${this.powerNeeded} ${this.args} (${this.cost}MB)`;
     }
+
+    /**
+     * @param {ExecutionPolicy} policy
+     * @returns Whether the Node satisfies the constraints of the policy
+     * @see ExecutionPolicy
+     */
+    matchesPolicy(policy)
+    {
+        return (policy.allowed_types &amp; this.type) != 0;
+    }
 }
 
+/**
+ * A Batch is simply a collection of Tasks that can be assigned at the same time.
+ * This is mostly for convenience and adding a layer of abstraction in cases where we have a lot of tasks to assign.
+ * @note A Batch is also a Task, so it is possible to make Batches of Batches. Matryoshka?
+ * @warn Batching tasks does NOT mean that the tasks will be executed on the same node, nor that the tasks will be executed sequentially.
+ */
 export class Batch extends Task
 {
     constructor(ns, tasks = [])
@@ -93,6 +122,12 @@ export class Batch extends Task
     }
 }
 
+/**
+ * A Node represents a Host that is capable of running tasks.
+ * It is usually used along with a @see WorkloadManager.
+ * @extends lib.Host
+ * @param {NS} ns The NetScript instance. Mandatory.
+ */
 export class Node extends lib.Host
 {
     constructor(ns, name)
@@ -100,13 +135,18 @@ export class Node extends lib.Host
         super(ns, name);
     }
 
+    /**
+     * @param {Task} task The task to assign to the node
+     * @param {number} factor The number of time this task will be assigned to the node.
+     * @returns {Promise&lt;number>} The amount of power that was used to run the task
+     */
     async run(task, factor = 1)
     {
         if (factor &lt; 1)
         {
             return;
         }
-        if (task.tasks != null)
+        if (task.tasks != null) // batch
         {
             for (let t of task.tasks)
             {
@@ -117,8 +157,14 @@ export class Node extends lib.Host
         {
             await this.exec(task.script, factor, task.args);
         }
+        return factor * this.cores;
     }
 
+    /**
+     * Runs a task as many times as possible on the node, ignoring the remaining cost of the task.
+     * @param {Task} task
+     * @returns {Promise&lt;number>} The amount of power that was used to run the task
+     */
     async fill(task)
     {
         let concurrent = this.currentAvailableRam / task.cost;
@@ -128,7 +174,7 @@ export class Node extends lib.Host
     }
 
     /**
-     * @param {Task} task 
+     * @param {Task} task
      * @returns The amount of power the node can potentially run the task with
      */
     satisfaction(task)
@@ -143,12 +189,14 @@ export class Node extends lib.Host
     }
 }
 
+/**
+ * A WorkloadManager is responsible for assigning tasks to nodes.
+ * It acts as an interface between the user and the nodes.
+ * @param {NS} ns The NetScript instance. Mandatory.
+ * @param {Node[]} nodes A list of nodes to assign tasks to.
+ */
 export class WorkloadManager
 {
-    /**
-     * @param {NS} ns
-     * @param {Array&lt;Node>} nodes
-     */
     constructor(ns, nodes = [])
     {
         this.ns = ns;
@@ -186,8 +234,8 @@ export class WorkloadManager
 
     /**
      * Get a summary of the current state of the network
-     * @param {*} depth If depth is 0, only a brief summary is returned. If depth is 1, all nodes are returned.
-     * @returns A string containing a summary of the current state of the network
+     * @param {number} depth If depth is 0, only a brief summary is returned. If depth is 1, all nodes are returned.
+     * @returns {string} A string containing a summary of the current state of the network
      */
     summary(depth = 0)
     {
@@ -208,14 +256,15 @@ export class WorkloadManager
 
     /**
      * Assign a task to be executed. The manager will assign the task to multiple nodes if necessary.
-     * @param {*} task The task to be executed. Can be a Batch or a Task.
-     * @param {*} fill If true, upon assignment, the entire node RAM will be used to execute the task. This is useful for some misc scripts but it is not recommended for most workloads.
-     * @returns The amount of satisfaction that the task has been assigned. This is the amount of power that has been allocated to the task.
+     * @param {Task|Batch} task The task to be executed. Can be a Batch or a Task.
+     * @param {boolean} fill If true, upon assignment, the entire node RAM will be used to execute the task. This is useful for some misc scripts but it is not recommended for most workloads.
+     * @returns {number} The amount of power that was used to run the task. If this is less than the powerNeeded of the task, the task was not finished. This can also be superior to the powerNeeded of the task if the task does not have the strict_power_allocation flag set.
+     * @note This function will timeout after 2 seconds.
      */
-    async assign(task, fill = false)
+    async assign(task, fill = false) //TODO: refactor this to be more readable
     {
         this.execs++;
-        let assign_time_threshold = Date.now() + 2000;
+        let assign_time_threshold = Date.now() + 2000; // timeout is very likely caused by a bug in the workload manager, need to investigate
         let totalPowerAllocated = 0;
         if (task.tasks) // Batch; assign each task individually
         {
@@ -236,7 +285,7 @@ export class WorkloadManager
             let node = null;
             for (let n of this.nodes)
             {
-                if (n.currentAvailableRam >= task.cost &amp;&amp; (task.canRunOnHome || n.name != "home"))
+                if (n.currentAvailableRam >= task.cost &amp;&amp; n.matchesPolicy(task))
                 {
                     node = n;
                     break;
@@ -258,7 +307,7 @@ export class WorkloadManager
                 await node.run(task, threads);
                 allocated_power += threads;
             }
-            await node.update();
+            node.update();
             this.currentAvailableRam -= task.cost; // save some time by not updating the network state; maybe risky?
             task.powerNeeded -= allocated_power;
             totalPowerAllocated += allocated_power;
@@ -267,8 +316,8 @@ export class WorkloadManager
     }
 
     /**
-     * Apply a task to ALL nodes in the network.
-     * @param {*} task 
+     * Assign a task to ALL nodes in the network.
+     * @param {Task} task
      */
     async map(task)
     {
@@ -281,7 +330,8 @@ export class WorkloadManager
 
     /**
      * Assign a task as many times as possible
-     * @param {*} task 
+     * @param {!Task} task
+     * @param {boolean} fill
      */
     async fill(task, fill = false)
     {
@@ -358,7 +408,7 @@ export class WorkloadManager
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Fri Aug 05 2022 14:17:02 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Fri Aug 05 2022 16:48:12 GMT+0000 (Coordinated Universal Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
