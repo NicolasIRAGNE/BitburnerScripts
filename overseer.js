@@ -3,7 +3,7 @@
  * For each host in the network, the overseer will install and run appropriate programs to target a list of targets.
  */
 
-import * as lib from "./lib.js";
+import * as lib from "./lib/lib.js";
 import * as wm from "./workload_manager.js";
 
 /**

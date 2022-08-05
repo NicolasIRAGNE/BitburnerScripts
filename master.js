@@ -1,18 +1,21 @@
-import * as lib from "./lib.js";
+import * as lib from "./lib/lib.js";
 
 export async function main(ns)
 {
+    lib.init(ns);
     const growName = "grow.js";
     const hackName = "hack.js";
     let hosts = [];
-    await lib.recurse_scan_legacy(ns, "home", hosts, [lib.try_nuke]);
-    await ns.tprint(`hosts = ${JSON.stringify(hosts)}`);
-    hosts = hosts.filter(host => ns.hasRootAccess(host));
-    ns.tprint(`hosts = ${JSON.stringify(hosts)}`);
-    let targets = hosts.filter(function(host) { return lib.target_blacklist.indexOf(host) === -1; });
-    targets = targets.filter(target => ns.getHackingLevel() >= ns.getServerRequiredHackingLevel(target));
-    targets = targets.filter(target => ns.getServerMaxMoney(target) > 0);
-    // targets = targets.filter(target => ns.getServerMoneyAvailable(target) > 0);
+    await lib.recurse_scan(ns, "home", hosts, [lib.try_nuke]);
+    hosts = hosts.filter(host => ns.hasRootAccess(host.name));
+    ns.tprint("Found " + hosts.length + " hosts with root access:");
+    for (let host of hosts)
+    {
+        ns.tprint("\t" + host.repr());
+    }
+    let targets = hosts.filter(function(host) { return host.type !== lib.HostType.OWN; });
+    targets = targets.filter(target => target.canHack);
+    targets = targets.filter(target => target.maxMoney > 0);
     if (ns.args[0] != null)
     {
         targets = [ns.args[0]];
@@ -22,8 +25,9 @@ export async function main(ns)
     let installs = 0;
     let hostsCount = 0;
     const hackLevel = await ns.getHackingLevel();
-    for (let hostname of hosts)
+    for (let h of hosts)
     {
+        let hostname = h.name;
         if (!await ns.hasRootAccess(hostname))
         {
             ns.tprint(`No root access on ${hostname}, skipping...`);

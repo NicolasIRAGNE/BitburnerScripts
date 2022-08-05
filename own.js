@@ -2,7 +2,7 @@
  * Install and run a script on owned servers.
  */
 
-import * as lib from "./lib.js";
+import * as lib from "./lib/lib.js";
 
 export async function main(ns)
 {

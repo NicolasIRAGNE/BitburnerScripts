@@ -4,7 +4,7 @@
  * NOTE: this doesnt fucking work and i dont feel like fixing it.
  */
 
-import * as lib from "./lib.js";
+import * as lib from "./lib/lib.js";
 
 class Node
 {
