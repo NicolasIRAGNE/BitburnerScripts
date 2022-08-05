@@ -32,12 +32,17 @@ function good()
     t.expect_true(true); // pass
 }
 
-export async function main(ns)
+export async function run_tests(ns)
 {
     lib.init(ns);
     t.init(ns);
     basic();
     floats();
     good();
+}
+
+export async function main(ns)
+{
+    await run_tests(ns);
     t.printReport();
 }
