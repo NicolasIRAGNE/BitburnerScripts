@@ -6,10 +6,11 @@ import * as lib from "./lib/lib.js";
 
 export async function main(ns)
 {
-    lib.init(ns);
+    await lib.init(ns);
     const ramCost = await ns.getScriptRam(ns.args[0]);
     let total = 0;
-    for (let server of lib.own_servers)
+    let hosts = lib.own_servers.filter(s => !(s.type & lib.HostType.HOME));
+    for (let server of hosts)
     {
         let host = server.name;
         try

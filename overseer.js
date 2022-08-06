@@ -95,7 +95,7 @@ async function generate_batch(ns, host, prep = false)
 
 export async function main(ns)
 {
-    lib.init(ns);
+    await lib.init(ns);
     // Get the list of hosts in the network
     let all_hosts = [];
     await lib.recurse_scan(ns, "home", all_hosts, [lib.try_nuke]);
@@ -133,7 +133,7 @@ export async function main(ns)
     await ns.sleep(100);
     await ns.tprint("Starting manager...\n");
     await ns.sleep(100);
-    let manager = new wm.WorkloadManager(ns);
+    let manager = await ns.createWorkloadManager(ns);
     await ns.tprint("Updating network...\n");
     await ns.sleep(100);
     await manager.update_network();

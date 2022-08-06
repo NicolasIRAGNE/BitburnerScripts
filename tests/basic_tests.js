@@ -27,6 +27,11 @@ function floats()
     // total: 7, pass: 4, fail: 3
 }
 
+async function wait(ns, time)
+{
+    await ns.sleep(time);
+}
+
 function good()
 {
     t.expect_true(true); // pass
@@ -34,11 +39,14 @@ function good()
 
 export async function run_tests(ns)
 {
-    lib.init(ns);
+    await ib.init(ns);
     t.init(ns);
     basic();
     floats();
     good();
+    await t.prof(wait, ns, 10);
+    await t.prof(wait, ns, 100);
+    await t.prof(ns.tprint, "Hello");
 }
 
 export async function main(ns)

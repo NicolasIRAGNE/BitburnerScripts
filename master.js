@@ -2,7 +2,7 @@ import * as lib from "./lib/lib.js";
 
 export async function main(ns)
 {
-    lib.init(ns);
+    await lib.init(ns);
     const growName = "grow.js";
     const hackName = "hack.js";
     let hosts = [];
