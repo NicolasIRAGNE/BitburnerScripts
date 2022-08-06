@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>ExecutionPolicy - Documentation</title>
+    <title>tests/workload_manager_unit_tests.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,140 +29,106 @@
 
 <div id="main">
     
-    <h1 class="page-title">ExecutionPolicy</h1>
+    <h1 class="page-title">tests/workload_manager_unit_tests.js</h1>
     
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2>
-        ExecutionPolicy
-        </h2>
-        
-            <div class="class-description">Allows specifying additional constraints on the execution of a task.</div>
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import * as lib from "/lib/lib.js";
+import * as wm from "/lib/workload_manager.js";
+import * as t from "/lib/testing";
 
-<article>
-    <div class="container-overview">
-    
-        
-<div class="section-method">
+let _ns = null;
 
-    
-    <h2>Constructor</h2>
-    
+async function tests_initialization(manager)
+{
+    t.expect_eq(manager.nodes.length, 0);
+    t.expect_eq(await manager.get_available_ram(), 0);
+    t.expect_eq(await manager.get_total_ram(), 0);
+    let noodles = await wm.createNode(_ns, "n00dles");
+    await manager.add_node(noodles);
+    t.expect_eq(manager.nodes.length, 1);
+    t.expect_eq(await manager.get_available_ram(), noodles.currentAvailableRam);
+    t.expect_eq(await manager.get_total_ram(), noodles.maxRam);
 
-    <h4 class="name" id="ExecutionPolicy"><span class="type-signature"></span>new ExecutionPolicy<span class="signature">()</span><span class="type-signature"></span></h4>
+    let foodnstuff = await wm.createNode(_ns, "foodnstuff");
+    await manager.add_node(foodnstuff);
+    t.expect_eq(manager.nodes.length, 2);
+    t.expect_eq(await manager.get_available_ram(), noodles.currentAvailableRam + foodnstuff.currentAvailableRam);
+    t.expect_eq(await manager.get_total_ram(), noodles.maxRam + foodnstuff.maxRam);
+}
 
-    
+async function tests_assignment(manager)
+{
+    let noodles = await wm.createNode(_ns, "n00dles");
+    let foodnstuff = await wm.createNode(_ns, "foodnstuff");
+    let task = new wm.Task(_ns, "wait.js", false, 50000, 0);
+    let expectedPowerAllocation = noodles.satisfaction(task) + foodnstuff.satisfaction(task);
+    let actualPowerAllocation = await manager.assign(task);
+    t.expect_eq(actualPowerAllocation, expectedPowerAllocation);
+    await _ns.sleep(300);
+    task = new wm.Task(_ns, "wait.js", false, 1, 0);
+    expectedPowerAllocation = 1;
+    actualPowerAllocation = await manager.assign(task);
+    t.expect_eq(actualPowerAllocation, expectedPowerAllocation);
+    await _ns.sleep(300);
+}
 
+/**
+ * 
+ * @param {wm.WorkloadManager} manager 
+ */
+async function tests_load(manager)
+{
+    const cost = 10000000;
+    let task = new wm.Task(_ns, "wait.js", false, cost, 1000);
+    _ns.tprint("Updating network...");
+    await t.prof(manager.update_network, manager);
+    _ns.tprint(`Total nodes: ${manager.nodes.length}`);
+    _ns.tprint(`${await manager.summary(0)}`);
+    let p = await t.prof(manager.assign, manager, task);
+    _ns.tprint(`${await manager.summary(0)}`);
+    _ns.tprint(`Allocated ${p} power`);
+    await _ns.sleep(1000);
+    _ns.tprint(`${await manager.summary(0)}`);
+    t.expect_eq(task.powerNeeded, cost - p);
 
+    const cost2 = await manager.get_total_ram() * 10 * task.cost;
+    let big_task = new wm.Task(_ns, "wait.js", false, cost, 10000);
+    big_task.policy = { allowed_types: ~lib.HostType.HOME };
+    while (big_task.powerNeeded > 0)
+    {
+        await t.prof(manager.assign, manager, big_task);
+        _ns.tprint(`${await manager.summary(0)}`);
+        await _ns.sleep(1);
+    }
+}
 
+export async function run_tests(ns)
+{
+    _ns = ns;
+    await lib.init(ns);
+    t.init(ns);
+    let manager = await wm.createWorkloadManager(ns);
+    await tests_initialization(manager);
+    await tests_assignment(manager);
+    await tests_load(manager);
+    manager.truc();
+}
 
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_workload_manager.js.html">lib/workload_manager.js</a>, <a href="lib_workload_manager.js.html#line7">line 7</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
-    
-    </div>
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="ExecutionPolicy.html">ExecutionPolicy</a></dt>
-            <dd></dd>
-        </dl>
-    
-
-     
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+export async function main(ns)
+{
+    await run_tests(ns);
+    t.printReport();
+}
+</code></pre>
+        </article>
+    </section>
 
 
 
