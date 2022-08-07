@@ -39,10 +39,6 @@ async function tests_assignment(manager)
     await _ns.sleep(300);
 }
 
-/**
- * 
- * @param {wm.WorkloadManager} manager 
- */
 async function tests_load(manager)
 {
     const cost = 10000000;
@@ -59,13 +55,24 @@ async function tests_load(manager)
     t.expect_eq(task.powerNeeded, cost - p);
 
     const cost2 = await manager.get_total_ram() * 2 * task.cost;
-    let big_task = new wm.Task(_ns, "wait.js", cost2, 1000);
+    let big_task = new wm.Task(_ns, "wait.js", cost2, 300);
     while (big_task.powerNeeded > 0)
     {
         let pow = await t.prof(manager.assign, manager, big_task);
-        _ns.tprint(`allocated ${pow}, remaining ${big_task.powerNeeded}, ${await manager.summary(0)}`);
+        // _ns.tprint(`allocated ${pow}, remaining ${big_task.powerNeeded}, ${await manager.summary(0)}`);
         await _ns.sleep(1);
     }
+    await _ns.sleep(400);
+}
+
+async function hello_world(manager)
+{
+    let task = new wm.Task(_ns, "/slaves/hello.js", 1);
+    task.policy = { forbidden_types: lib.HostType.HOME };
+    await manager.update_network();
+    let p = await t.prof(manager.map, manager, task);
+    t.expect_eq(p, 1 * manager.nodes.length - 1);
+    await _ns.sleep(100);
 }
 
 export async function run_tests(ns)
@@ -77,6 +84,7 @@ export async function run_tests(ns)
     await tests_initialization(manager);
     await tests_assignment(manager);
     await tests_load(manager);
+    await hello_world(manager);
     manager.truc();
 }
 
