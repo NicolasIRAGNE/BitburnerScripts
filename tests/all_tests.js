@@ -7,5 +7,5 @@ export async function main(ns)
     t.init(ns);
     await basic.run_tests(ns);
     await workload_manager_unit_tests.run_tests(ns);
-    t.printReport();
+    t.printReport(ns);
 }

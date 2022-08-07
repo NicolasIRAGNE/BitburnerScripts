@@ -58,7 +58,7 @@ async function tests_load(manager)
     _ns.tprint(`${await manager.summary(0)}`);
     t.expect_eq(task.powerNeeded, cost - p);
 
-    const cost2 = await manager.get_total_ram() * 10 * task.cost;
+    const cost2 = await manager.get_total_ram() * 2 * task.cost;
     let big_task = new wm.Task(_ns, "wait.js", cost2, 1000);
     while (big_task.powerNeeded > 0)
     {
@@ -83,5 +83,5 @@ export async function run_tests(ns)
 export async function main(ns)
 {
     await run_tests(ns);
-    t.printReport();
+    t.printReport(ns);
 }

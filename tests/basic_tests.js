@@ -52,5 +52,5 @@ export async function run_tests(ns)
 export async function main(ns)
 {
     await run_tests(ns);
-    t.printReport();
+    t.printReport(ns);
 }
