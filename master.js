@@ -7,7 +7,7 @@ export async function main(ns)
     const hackName = "hack.js";
     let hosts = [];
     await lib.recurse_scan(ns, "home", hosts, [lib.try_nuke]);
-    hosts = hosts.filter(host => ns.hasRootAccess(host.name));
+    hosts = hosts.filter(host => host.hasAdminRights);
     ns.tprint("Found " + hosts.length + " hosts with root access:");
     for (let host of hosts)
     {
@@ -28,7 +28,7 @@ export async function main(ns)
     for (let h of hosts)
     {
         let hostname = h.name;
-        if (!await ns.hasRootAccess(hostname))
+        if (!h.hasAdminRights)
         {
             ns.tprint(`No root access on ${hostname}, skipping...`);
             continue;

@@ -105,7 +105,7 @@ export async function main(ns)
     //  * where we do not have root access
 
     // Filter out the hosts that we do not have root access to and that have no RAM available
-    let hosts = all_hosts.filter(function (host) { return host.hasRootAccess; });
+    let hosts = all_hosts.filter(function (host) { return host.hasAdminRights; });
     hosts = hosts.filter(function (host) { return host.maxRam > 0; });
 
     // Now we need our target list.

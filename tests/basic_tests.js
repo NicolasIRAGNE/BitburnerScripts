@@ -39,14 +39,14 @@ function good()
 
 export async function run_tests(ns)
 {
-    await ib.init(ns);
+    await lib.init(ns);
     t.init(ns);
     basic();
     floats();
     good();
-    await t.prof(wait, ns, 10);
-    await t.prof(wait, ns, 100);
-    await t.prof(ns.tprint, "Hello");
+    await t.prof(wait, null, ns, 10);
+    await t.prof(wait, null, ns, 100);
+    await t.prof(ns.tprint, ns, "Hello");
 }
 
 export async function main(ns)

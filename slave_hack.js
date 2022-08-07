@@ -1,3 +1,4 @@
+/** @param {import(".").NS} ns */
 export async function main(ns)
 {
     // await ns.tprint(`hack: sleeping for ${ns.args[1]}ms`);

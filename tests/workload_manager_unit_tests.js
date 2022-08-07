@@ -26,12 +26,13 @@ async function tests_assignment(manager)
 {
     let noodles = await wm.createNode(_ns, "n00dles");
     let foodnstuff = await wm.createNode(_ns, "foodnstuff");
-    let task = new wm.Task(_ns, "wait.js", false, 50000, 0);
+    _ns.tprint(`Noodles cores : ${noodles.cpuCores}`);
+    let task = new wm.Task(_ns, "wait.js", 50000, 0);
     let expectedPowerAllocation = noodles.satisfaction(task) + foodnstuff.satisfaction(task);
     let actualPowerAllocation = await manager.assign(task);
     t.expect_eq(actualPowerAllocation, expectedPowerAllocation);
     await _ns.sleep(300);
-    task = new wm.Task(_ns, "wait.js", false, 1, 0);
+    task = new wm.Task(_ns, "wait.js", 1, 0);
     expectedPowerAllocation = 1;
     actualPowerAllocation = await manager.assign(task);
     t.expect_eq(actualPowerAllocation, expectedPowerAllocation);
@@ -45,7 +46,7 @@ async function tests_assignment(manager)
 async function tests_load(manager)
 {
     const cost = 10000000;
-    let task = new wm.Task(_ns, "wait.js", false, cost, 1000);
+    let task = new wm.Task(_ns, "wait.js", cost, 1000);
     _ns.tprint("Updating network...");
     await t.prof(manager.update_network, manager);
     _ns.tprint(`Total nodes: ${manager.nodes.length}`);
@@ -53,17 +54,16 @@ async function tests_load(manager)
     let p = await t.prof(manager.assign, manager, task);
     _ns.tprint(`${await manager.summary(0)}`);
     _ns.tprint(`Allocated ${p} power`);
-    await _ns.sleep(1000);
+    await _ns.sleep(1100);
     _ns.tprint(`${await manager.summary(0)}`);
     t.expect_eq(task.powerNeeded, cost - p);
 
     const cost2 = await manager.get_total_ram() * 10 * task.cost;
-    let big_task = new wm.Task(_ns, "wait.js", false, cost, 10000);
-    big_task.policy = { allowed_types: ~lib.HostType.HOME };
+    let big_task = new wm.Task(_ns, "wait.js", cost2, 1000);
     while (big_task.powerNeeded > 0)
     {
-        await t.prof(manager.assign, manager, big_task);
-        _ns.tprint(`${await manager.summary(0)}`);
+        let pow = await t.prof(manager.assign, manager, big_task);
+        _ns.tprint(`allocated ${pow}, remaining ${big_task.powerNeeded}, ${await manager.summary(0)}`);
         await _ns.sleep(1);
     }
 }
