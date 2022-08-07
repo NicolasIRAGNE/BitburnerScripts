@@ -11,16 +11,17 @@ export async function main(ns)
     ns.tprint("Found " + hosts.length + " hosts with root access:");
     for (let host of hosts)
     {
+        await host.update();
         ns.tprint("\t" + host.repr());
     }
     let targets = hosts.filter(function(host) { return host.type !== lib.HostType.OWN; });
     targets = targets.filter(target => target.canHack);
-    targets = targets.filter(target => target.maxMoney > 0);
+    targets = targets.filter(target => target.moneyMax > 0);
     if (ns.args[0] != null)
     {
         targets = [ns.args[0]];
     }
-    const ramCost = await ns.getScriptRam(growName) * 6 + await ns.getScriptRam(hackName) * 1;
+    const ramCost = await ns.getScriptRam(growName) * 4 + await ns.getScriptRam(hackName) * 1;
     // Scan hosts recursively for all targets
     let installs = 0;
     let hostsCount = 0;
@@ -53,7 +54,7 @@ export async function main(ns)
         {
             const target = targets[i % targets.length].name;
             await ns.tprint(`\tRunning ${growName} ${target} with ${threads} threads... [${usedRam + ramCost * threads}/${maxRam}]`);
-            let res = await ns.exec(growName, hostname, 6 * threads, target, i);
+            let res = await ns.exec(growName, hostname, 4 * threads, target, i);
             if (res === 0)
             {
                 await ns.tprint(`\tThere was an error running ${growName} on ${target}`);
