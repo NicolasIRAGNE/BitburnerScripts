@@ -6,10 +6,11 @@ export async function main(ns)
     try
     {
         let hack = await ns.hack(ns.args[0]);
+        ns.tprint(`Hacked ${hack} from ${ns.args[0]}`);
     }
     catch (e)
     {
-        await ns.tprint(`Error: ${e}`);
+        await ns.tprint(`Error: ${e.message}`);
     }
     // ns.tprint("HACK");
     // await ns.print(`At end of main(): currentMoney = ${await ns.getServerMoneyAvailable(ns.args[0])}, currentSec = ${await ns.getServerSecurityLevel(ns.args[0])}`);

@@ -4,7 +4,18 @@
  */
 
 import * as lib from "./lib/lib.js";
-import * as wm from "./workload_manager.js";
+import * as wm from "./lib/workload_manager.js";
+import * as t from "./lib/testing.js";
+
+async function backdoor(ns, hostname)
+{
+    if (ns.getServer(hostname).requiredHackingSkill <= await ns.getHackingLevel())
+    {
+        await ns.singularity.connect(hostname);
+        await ns.singularity.installBackdoor(hostname);
+    }
+}
+
 
 /**
  * Generate a batch that will steal hackTarget of a target's money then grow it back to its original money and security
@@ -99,7 +110,10 @@ export async function main(ns)
     // Get the list of hosts in the network
     let all_hosts = [];
     await lib.recurse_scan(ns, "home", all_hosts, [lib.try_nuke]);
-
+    ns.disableLog("getHackingLevel");
+    ns.disableLog("scan");
+    ns.disableLog("sleep");
+    
     // At this point, hosts is a list of all the hosts in the network.
     // To get our definitive host list, we need to filter out the hosts:
     //  * where we do not have root access
@@ -121,7 +135,12 @@ export async function main(ns)
     targets = targets.filter(function (host) { return host.canHack });
 
     // Filter out the targets that have no money to hack
-    targets = targets.filter(function (host) { return host.maxMoney > 0; });
+    targets = targets.filter(function (host) { return host.moneyMax > 0; });
+
+    const whitelist = ["foodnstuff", "n00dles", "joesguns"]
+
+    targets = targets.filter(function (host) { return whitelist.indexOf(host.name) !== -1; });
+
 
     // Now we have our definitive target and host list.
     await ns.tprint(`${targets.length} hackable targets found:\n`);
@@ -133,7 +152,12 @@ export async function main(ns)
     await ns.sleep(100);
     await ns.tprint("Starting manager...\n");
     await ns.sleep(100);
-    let manager = await ns.createWorkloadManager(ns);
+    let manager = await wm.createWorkloadManager(ns);
+    ns.atExit(() => {
+        ns.tprint("Exiting...");
+        t.printReport(ns);
+        manager.truc();
+    });
     await ns.tprint("Updating network...\n");
     await ns.sleep(100);
     await manager.update_network();
@@ -148,35 +172,35 @@ export async function main(ns)
         return;
     }
     await ns.tprint(`Available resources:\n`);
-    await ns.tprint(`${manager.summary()}\n`);
+    await ns.tprint(`${await manager.summary()}\n`);
     let tick = 0;
 
-    for (let target of targets)
-    {
-        let prep_batch = await generate_batch(ns, target, true);
-        let timer_start = Date.now();
+    // for (let target of targets)
+    // {
+    //     let prep_batch = await generate_batch(ns, target, true);
+    //     let timer_start = Date.now();
 
-        let totalPowerAllocated = await manager.assign(prep_batch);
-        let timer_end = Date.now();
-        let timer_diff = timer_end - timer_start;
-        let weakenTime = await ns.formulas.hacking.weakenTime(ns.getServer(target.name), ns.getPlayer());
-        let growTime = await ns.formulas.hacking.growTime(ns.getServer(target.name), ns.getPlayer());
-        let hackTime = await ns.formulas.hacking.hackTime(ns.getServer(target.name), ns.getPlayer());
-        let offset = Math.max(weakenTime, growTime);
-        // wait until targets are full to start the batches
-        target.busyUntil = Date.now() + offset + 150;
-        if (totalPowerAllocated < prep_batch.cost)
-        {
-            await ns.tprint(`${target.name} could not be launched because it did not have enough power\n`);
-        }
-    }
+    //     let totalPowerAllocated = await manager.assign(prep_batch);
+    //     let timer_end = Date.now();
+    //     let timer_diff = timer_end - timer_start;
+    //     let weakenTime = await ns.formulas.hacking.weakenTime(ns.getServer(target.name), ns.getPlayer());
+    //     let growTime = await ns.formulas.hacking.growTime(ns.getServer(target.name), ns.getPlayer());
+    //     let hackTime = await ns.formulas.hacking.hackTime(ns.getServer(target.name), ns.getPlayer());
+    //     let offset = Math.max(weakenTime, growTime);
+    //     // wait until targets are full to start the batches
+    //     target.busyUntil = Date.now() + offset + 150;
+    //     if (totalPowerAllocated < prep_batch.cost)
+    //     {
+    //         await ns.tprint(`${target.name} could not be launched because it did not have enough power\n`);
+    //     }
+    // }
 
     while (true)
     {
         let timer_start = Date.now();
-        if (tick % 100)
+        if (tick % 100 === 0)
         {
-            await manager.assign(new wm.Task(ns, "purchase.js", true, 1, "20", "yes"));
+            await manager.assign(new wm.Task(ns, "purchase.js", 1, "20", "yes"));
             await manager.update_network();
         }
         let timer_start_target = Date.now();
@@ -200,36 +224,50 @@ export async function main(ns)
                 skipped++;
                 continue;
             }
-            let batch_timer_start = Date.now();
-            let batch = await generate_batch(ns, target);
-            let batch_timer_end = Date.now();
-            batch_timer += batch_timer_end - batch_timer_start;
-            if (await manager.get_available_ram() >= batch.cost)
-            {
-                let assign_timer_start = Date.now();
-                let totalPowerAllocated = await manager.assign(batch);
-                let assign_timer_end = Date.now();
-                assign_timer += assign_timer_end - assign_timer_start;
-                target.busyUntil = Date.now() + 33;
-                // return;
-            }
-            else
-            {
-                await ns.tprint(`Could not assign enough power to ${target.name} (${await manager.get_available_ram()}/${batch.cost})\n`);
-            }
+            // let batch_timer_start = Date.now();
+            // let batch = await generate_batch(ns, target);
+            // let batch_timer_end = Date.now();
+            // batch_timer += batch_timer_end - batch_timer_start;
+            // if (await manager.get_available_ram() >= batch.cost)
+            // {
+            //     let assign_timer_start = Date.now();
+            //     let totalPowerAllocated = await manager.assign(batch);
+            //     let assign_timer_end = Date.now();
+            //     assign_timer += assign_timer_end - assign_timer_start;
+            //     target.busyUntil = Date.now() + 33;
+            //     // return;
+            // }
+            // else
+            // {
+            //     await ns.tprint(`Could not assign enough power to ${target.name} (${await manager.get_available_ram()}/${batch.cost})\n`);
+            // }
+            const grownumber = 70;
+            const hacknumber = 70;
+            const weakennumber = grownumber * 0.2 + hacknumber * 0.2;
+            let growtask = new wm.Task(ns, "/slaves/grow.js", grownumber, target.name);
+            let weakentask = new wm.Task(ns, "/slaves/weaken.js", weakennumber , target.name);
+            let hacktask = new wm.Task(ns, "/slaves/hack_if_full.js", hacknumber, target.name);
+            let batch = new wm.Batch(ns, [growtask, weakentask, hacktask]);
+            await manager.assign(batch);
+            target.busyUntil = Date.now() + ns.getWeakenTime(target.name) / 2;
+            // await ns.tprint(`${target.name} is busy for ${target.busyUntil - Date.now()}ms\n`);
             await ns.sleep(1);
         }
         let timer_end_target = Date.now();
         // await ns.tprint(`\tTargets took ${timer_end_target - timer_start_target}ms to update (batch: ${batch_timer}ms, assign: ${assign_timer}ms), skipped ${skipped}\n`);
 
-        if (tick % 100 === 0)
+        if (tick % 1000 === 0)
         {
-            await ns.tprint(`${manager.summary()}`);
+            await ns.toast(`${await manager.summary()}`, "info", 4000);
+        }
+        if (tick === 100)
+        {
+            // return;
         }
         await ns.sleep(1);
         tick++;
         let timer_end = Date.now();
-        await ns.tprint(`Tick ${tick} in ${timer_end - timer_start}ms (${skipped} skipped)\n`);
+        // await ns.tprint(`Tick ${tick} in ${timer_end - timer_start}ms (${skipped} skipped)\n`);
         // return;
     }
 }

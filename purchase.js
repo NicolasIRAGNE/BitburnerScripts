@@ -18,7 +18,7 @@ export async function main(ns)
             let new_host = await ns.purchaseServer("rob", size);
             if (new_host.length > 0)
             {
-                await ns.print(`Purchased ${new_host}`);
+                await ns.toast(`Purchased ${new_host}`);
             }
             else
             {

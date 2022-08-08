@@ -1,12 +1,21 @@
 import * as lib from "./lib/lib.js";
 
+async function backdoor(ns, hostname)
+{
+    if (ns.getServer(hostname).requiredHackingSkill <= await ns.getHackingLevel())
+    {
+        await ns.singularity.connect(hostname);
+        await ns.singularity.installBackdoor(hostname);
+    }
+}
+
 export async function main(ns)
 {
     await lib.init(ns);
     const growName = "grow.js";
     const hackName = "hack.js";
     let hosts = [];
-    await lib.recurse_scan(ns, "home", hosts, [lib.try_nuke]);
+    await lib.recurse_scan(ns, "home", hosts, [lib.try_nuke, backdoor]);
     hosts = hosts.filter(host => host.hasAdminRights);
     ns.tprint("Found " + hosts.length + " hosts with root access:");
     for (let host of hosts)
@@ -15,11 +24,16 @@ export async function main(ns)
         ns.tprint("\t" + host.repr());
     }
     let targets = hosts.filter(function(host) { return host.type !== lib.HostType.OWN; });
-    targets = targets.filter(target => target.canHack);
+    targets = targets.filter(target => target.canHack === true);
     targets = targets.filter(target => target.moneyMax > 0);
     if (ns.args[0] != null)
     {
         targets = [ns.args[0]];
+    }
+    ns.tprint("Found " + targets.length + " targets:");
+    for (let target of targets)
+    {
+        ns.tprint(`Found target ${target.name}`);
     }
     const ramCost = await ns.getScriptRam(growName) * 4 + await ns.getScriptRam(hackName) * 1;
     // Scan hosts recursively for all targets
