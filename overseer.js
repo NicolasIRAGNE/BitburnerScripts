@@ -104,6 +104,10 @@ async function generate_batch(ns, host, prep = false)
     return batch;
 }
 
+const grownumber = 35;
+const hacknumber = 35;
+const weakennumber = grownumber * 0.2 + hacknumber * 0.2;
+
 export async function main(ns)
 {
     await lib.init(ns);
@@ -113,7 +117,7 @@ export async function main(ns)
     ns.disableLog("getHackingLevel");
     ns.disableLog("scan");
     ns.disableLog("sleep");
-    
+
     // At this point, hosts is a list of all the hosts in the network.
     // To get our definitive host list, we need to filter out the hosts:
     //  * where we do not have root access
@@ -137,9 +141,9 @@ export async function main(ns)
     // Filter out the targets that have no money to hack
     targets = targets.filter(function (host) { return host.moneyMax > 0; });
 
-    const whitelist = ["foodnstuff", "n00dles", "joesguns"]
 
-    targets = targets.filter(function (host) { return whitelist.indexOf(host.name) !== -1; });
+    // const whitelist = ["foodnstuff", "n00dles", "joesguns"]
+    // targets = targets.filter(function (host) { return whitelist.indexOf(host.name) !== -1; });
 
 
     // Now we have our definitive target and host list.
@@ -153,10 +157,11 @@ export async function main(ns)
     await ns.tprint("Starting manager...\n");
     await ns.sleep(100);
     let manager = await wm.createWorkloadManager(ns);
-    ns.atExit(() => {
+    ns.atExit(() =>
+    {
         ns.tprint("Exiting...");
         t.printReport(ns);
-        manager.truc();
+        manager.printReport();
     });
     await ns.tprint("Updating network...\n");
     await ns.sleep(100);
@@ -208,8 +213,19 @@ export async function main(ns)
         let batch_timer = 0;
         let assign_timer = 0;
         let loop_threshold = Date.now() + 2000;
+        const ramCost = new wm.Task(ns, "/slaves/grow.js", grownumber).powerNeeded
+            + new wm.Task(ns, "/slaves/weaken.js", weakennumber).powerNeeded
+            + new wm.Task(ns, "/slaves/hack_if_full.js", hacknumber).powerNeeded
+            + 1;
+        let i = 0;
         for (let target of targets)
         {
+            i++;
+            if (ramCost * i > await manager.get_available_ram())
+            {
+                skipped++;
+                continue;
+            }
             if (Date.now() > loop_threshold)
             {
                 await ns.tprint(`Loop threshold reached, skipping remaining targets\n`);
@@ -241,14 +257,16 @@ export async function main(ns)
             // {
             //     await ns.tprint(`Could not assign enough power to ${target.name} (${await manager.get_available_ram()}/${batch.cost})\n`);
             // }
-            const grownumber = 70;
-            const hacknumber = 70;
-            const weakennumber = grownumber * 0.2 + hacknumber * 0.2;
+
             let growtask = new wm.Task(ns, "/slaves/grow.js", grownumber, target.name);
-            let weakentask = new wm.Task(ns, "/slaves/weaken.js", weakennumber , target.name);
+            let weakentask = new wm.Task(ns, "/slaves/weaken.js", weakennumber, target.name);
             let hacktask = new wm.Task(ns, "/slaves/hack_if_full.js", hacknumber, target.name);
             let batch = new wm.Batch(ns, [growtask, weakentask, hacktask]);
-            await manager.assign(batch);
+            let pow = await manager.assign(batch);
+            if (pow < batch.powerNeeded)
+            {
+                await ns.tprint(`Could not assign enough power to ${target.name} (${pow}/${batch.powerNeeded})\n`);
+            }
             target.busyUntil = Date.now() + ns.getWeakenTime(target.name) / 2;
             // await ns.tprint(`${target.name} is busy for ${target.busyUntil - Date.now()}ms\n`);
             await ns.sleep(1);
@@ -258,7 +276,7 @@ export async function main(ns)
 
         if (tick % 1000 === 0)
         {
-            await ns.toast(`${await manager.summary()}`, "info", 4000);
+            await ns.toast(`${await manager.summary()} (${skipped} skipped)`, "info", 4000);
         }
         if (tick === 100)
         {

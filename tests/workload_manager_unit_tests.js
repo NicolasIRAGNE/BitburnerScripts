@@ -85,7 +85,7 @@ export async function run_tests(ns)
     await tests_assignment(manager);
     await tests_load(manager);
     await hello_world(manager);
-    manager.truc();
+    manager.printReport();
 }
 
 export async function main(ns)

@@ -15,7 +15,7 @@ export async function main(ns)
     const growName = "grow.js";
     const hackName = "hack.js";
     let hosts = [];
-    await lib.recurse_scan(ns, "home", hosts, [lib.try_nuke, backdoor]);
+    await lib.recurse_scan(ns, "home", hosts, [lib.try_nuke]);
     hosts = hosts.filter(host => host.hasAdminRights);
     ns.tprint("Found " + hosts.length + " hosts with root access:");
     for (let host of hosts)
