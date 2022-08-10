@@ -57,21 +57,19 @@ async function handlePotentialPurchases(ns)
     for (const program of programs)
     {
         const price = ns.singularity.getDarkwebProgramCost(program);
-        if (price > moneyAvailable)
-            continue;
-        if (ns.fileExists(program, "home"))
+        if (price > moneyAvailable || price === 0)
             continue;
         const res = ns.singularity.purchaseProgram(program);
         if (res)
             ns.toast(`Purchased ${program} from DarkWeb`, "info", 6000);
     }
     let affordableRamAmount = affordableRam(ns, moneyAvailable);
-    if (ns.getPurchasedServers().length >= ns.getPurchasedServerLimit())
-    {
-        await deleteServer(ns, affordableRamAmount);
-    }
     if (affordableRamAmount > 2)
     {
+        if (ns.getPurchasedServers().length >= ns.getPurchasedServerLimit())
+        {
+            await deleteServer(ns, affordableRamAmount);
+        }
         const res = ns.purchaseServer("rob", affordableRamAmount);
         if (res)
             ns.toast(`Purchased ${affordableRamAmount} RAM`, "success", 6000);

@@ -6,7 +6,7 @@ export async function main(ns)
     let moneyAvailable = await ns.getServerMoneyAvailable(hostname);
     if (moneyAvailable < maxMoney * hackThreshold)
     {
-        ns.print(`Not enough money, waiting...`);
+        // ns.print(`Not enough money, waiting...`);
         await ns.grow(hostname);
         return;
     }
