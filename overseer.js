@@ -104,9 +104,19 @@ async function generate_batch(ns, host, prep = false)
     return batch;
 }
 
-const grownumber = 35;
-const hacknumber = 35;
+const grownumber = 40;
+const hacknumber = 40;
 const weakennumber = grownumber * 0.2 + hacknumber * 0.2;
+
+const singularityTasks = [
+    "/singularity/backdoors.js",
+    "/singularity/factions.js",
+    "/singularity/hacknet.js",
+    "/singularity/playerstate.js",
+    "/singularity/purchases.js",
+]
+
+const mostExpensiveSingularityTask = async (ns) => { let max = 0; for (let task of singularityTasks) { let cost = await ns.getScriptRam(task); if (cost > max) { max = cost; } } return max; }
 
 export async function main(ns)
 {
@@ -136,7 +146,7 @@ export async function main(ns)
     let targets = all_hosts.filter(function (host) { return lib.own_servers.indexOf(host.name) === -1; });
 
     // Filter out the targets that we do not have enough hacking level to hack
-    targets = targets.filter(function (host) { return host.canHack });
+    targets = targets.filter(function (host) { return host.canHack && host.hasRootAccess; });
 
     // Filter out the targets that have no money to hack
     targets = targets.filter(function (host) { return host.moneyMax > 0; });
@@ -165,7 +175,14 @@ export async function main(ns)
     });
     await ns.tprint("Updating network...\n");
     await ns.sleep(100);
-    await manager.update_network();
+    try
+    {
+        await manager.update_network();
+    }
+    catch (e)
+    {
+        ns.toast(`Failed to update network: a server was probably deleted`, "error");
+    }
     await ns.sleep(100);
     await ns.tprint("Updating network...done\n");
     if (ns.args.find(arg => arg === "--clean"))
@@ -179,36 +196,36 @@ export async function main(ns)
     await ns.tprint(`Available resources:\n`);
     await ns.tprint(`${await manager.summary()}\n`);
     let tick = 0;
-
-    // for (let target of targets)
-    // {
-    //     let prep_batch = await generate_batch(ns, target, true);
-    //     let timer_start = Date.now();
-
-    //     let totalPowerAllocated = await manager.assign(prep_batch);
-    //     let timer_end = Date.now();
-    //     let timer_diff = timer_end - timer_start;
-    //     let weakenTime = await ns.formulas.hacking.weakenTime(ns.getServer(target.name), ns.getPlayer());
-    //     let growTime = await ns.formulas.hacking.growTime(ns.getServer(target.name), ns.getPlayer());
-    //     let hackTime = await ns.formulas.hacking.hackTime(ns.getServer(target.name), ns.getPlayer());
-    //     let offset = Math.max(weakenTime, growTime);
-    //     // wait until targets are full to start the batches
-    //     target.busyUntil = Date.now() + offset + 150;
-    //     if (totalPowerAllocated < prep_batch.cost)
-    //     {
-    //         await ns.tprint(`${target.name} could not be launched because it did not have enough power\n`);
-    //     }
-    // }
-
+    let singularityTaskIndex = 0;
+    const mostExpensiveSingularityTaskCost = await mostExpensiveSingularityTask(ns);
     while (true)
     {
-        let timer_start = Date.now();
+        // let timer_start = Date.now();
         if (tick % 100 === 0)
         {
-            await manager.assign(new wm.Task(ns, "purchase.js", 1, "20", "yes"));
-            await manager.update_network();
+            let task = new wm.Task(ns, singularityTasks[singularityTaskIndex], 1);
+            let singularityTimerStart = Date.now();
+            while (await manager.assign(task) < task.powerNeeded)
+            {
+                // ns.toast(`Could not assign enough power to ${task.script} (${p}/${task.powerNeeded})`, "error", 1000);
+                await ns.sleep(1);
+            }
+            let singularityTimerEnd = Date.now();
+            singularityTaskIndex = (singularityTaskIndex + 1) % singularityTasks.length;
+            if (singularityTimerEnd - singularityTimerStart > 1000)
+                ns.toast(`Waited ${singularityTimerEnd - singularityTimerStart}ms for singularity task ${singularityTasks[singularityTaskIndex]}`, "info", 1000);
         }
-        let timer_start_target = Date.now();
+        if (tick % 1000 === 0)
+        {
+            try
+            {
+                await manager.update_network();
+            }
+            catch (e)
+            {
+                ns.toast(`Failed to update network: a server was probably deleted`, "error");
+            }
+        }
         let skipped = 0;
         let batch_timer = 0;
         let assign_timer = 0;
@@ -221,21 +238,23 @@ export async function main(ns)
         for (let target of targets)
         {
             i++;
-            if (ramCost * i > await manager.get_available_ram())
-            {
-                skipped++;
-                continue;
-            }
+            // if (ramCost * i + mostExpensiveSingularityTaskCost > await manager.get_available_ram())
+            // {
+            //     skipped++;
+            //     continue;
+            // }
             if (Date.now() > loop_threshold)
             {
                 await ns.tprint(`Loop threshold reached, skipping remaining targets\n`);
                 break;
             }
-            // For each target, need to:
-            //  * weaken until we are at the minimum security level
-            //  * grow until we are at the maximum security level
-            //  * launch a delayed hack task
+
             if (Date.now() < target.busyUntil)
+            {
+                skipped++;
+                continue;
+            }
+            if (ns.getWeakenTime(target.name) > 1000 * 60 * 2) // 2 minutes
             {
                 skipped++;
                 continue;
@@ -262,10 +281,24 @@ export async function main(ns)
             let weakentask = new wm.Task(ns, "/slaves/weaken.js", weakennumber, target.name);
             let hacktask = new wm.Task(ns, "/slaves/hack_if_full.js", hacknumber, target.name);
             let batch = new wm.Batch(ns, [growtask, weakentask, hacktask]);
-            let pow = await manager.assign(batch);
+            if (await manager.get_available_ram() < batch.cost)
+            {
+                // ns.toast(`Could not assign enough power to ${target.name} (${await manager.get_available_ram()}/${batch.cost})\n`, "error");
+                break;
+            }
+            let pow = 0;
+            try
+            {
+                pow =  await t.prof(manager.assign, manager, batch);
+
+            }
+            catch (e)
+            {
+                ns.toast(`Unkown error occured`);
+            }
             if (pow < batch.powerNeeded)
             {
-                await ns.tprint(`Could not assign enough power to ${target.name} (${pow}/${batch.powerNeeded})\n`);
+                // await ns.tprint(`Could not assign enough power to ${target.name} (${pow}/${batch.powerNeeded})\n`);
             }
             target.busyUntil = Date.now() + ns.getWeakenTime(target.name) / 2;
             // await ns.tprint(`${target.name} is busy for ${target.busyUntil - Date.now()}ms\n`);
@@ -277,14 +310,12 @@ export async function main(ns)
         if (tick % 1000 === 0)
         {
             await ns.toast(`${await manager.summary()} (${skipped} skipped)`, "info", 4000);
+
         }
-        if (tick === 100)
-        {
-            // return;
-        }
+        
         await ns.sleep(1);
         tick++;
-        let timer_end = Date.now();
+        // let timer_end = Date.now();
         // await ns.tprint(`Tick ${tick} in ${timer_end - timer_start}ms (${skipped} skipped)\n`);
         // return;
     }
