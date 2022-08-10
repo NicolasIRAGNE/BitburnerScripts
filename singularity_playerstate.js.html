@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>flemme.js - Documentation</title>
+    <title>singularity/playerstate.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,7 +29,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">flemme.js</h1>
+    <h1 class="page-title">singularity/playerstate.js</h1>
     
 
     
@@ -39,29 +39,11 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>
-const factionsWhitelist = ["CyberSec", "NiteSec", "The Black Hand", "BitRunners", "Tian Di Hui"]
-const factionsBlacklist = ["Ishima"];
+            <pre class="prettyprint source linenums"><code>const factionsBlacklist = [];
 const factionFavorThreshold = 150;
-const augmentationRepThreshold = 120000;
-
-const routeToCsec = ["harakiri-sushi", "CSEC"];
-const routeToNiteSec = ["iron-gym", "zer0", "neo-net", "avmnite-02h"];
-const routeToBlackHand = ["n00dles", "nectar-net", "silver-helix", "crush-fitness", "I.I.I.I"]
-
-const backdoorRoutes = [routeToCsec, routeToNiteSec, routeToBlackHand];
-
-async function handleFactionInvites(ns)
-{
-    let invites = ns.singularity.checkFactionInvitations(ns);
-    for (const faction of invites)
-    {
-        if (factionsWhitelist.includes(faction))
-        {
-            ns.singularity.joinFaction(faction);
-            ns.toast(`Joined ${faction}!`, "success");
-        }
-    }
+const augmentationRepThreshold = 49999;
+const customAugmentWeights = {
+    "CashRoot Starter Kit": 100
 }
 
 function shouldWorkForFaction(ns, faction)
@@ -90,20 +72,29 @@ function augmentScore(faction)
     let score = 0;
     let augs = ns.singularity.getAugmentationsFromFaction(faction);
     const ownedAugmentations = ns.singularity.getOwnedAugmentations();
+    const rep = ns.singularity.getFactionRep(faction);
     augs = augs.filter(a => !ownedAugmentations.includes(a)
-        &amp;&amp; ns.singularity.getAugmentationRepReq(a) > ns.singularity.getFactionRep(faction)
+        &amp;&amp; ns.singularity.getAugmentationRepReq(a) > rep
         &amp;&amp; ns.singularity.getAugmentationRepReq(a) &lt;= augmentationRepThreshold)
     for (const aug of augs)
     {
         const stats = ns.singularity.getAugmentationStats(aug);
-        score += 10 * (stats.faction_rep_mult || 0);
-        score += 5 * (stats.hacking_exp_mult || 0);
-        score += 5 * (stats.hacking_growth_mult || 0);
-        score += 5 * (stats.hacking_mult || 0);
-        score += 5 * (stats.hacking_exp_mult || 0);
-        score += 5 * (stats.hacking_speed_mult || 0);
-        score += 1;
+        const repReq = ns.singularity.getAugmentationRepReq(aug);
+        // the further rep is from repReq, the lower the score
+        const dist = Math.abs(rep - repReq);
+        const mult = (1 - dist / augmentationRepThreshold) * (repReq / 10000) * (rep / repReq);
+        // ns.tprint(`Mult for ${faction}'s ${aug}: ${mult}`);
+        // ns.tprint(`${JSON.stringify(stats)} ${repReq} ${dist} ${mult}`);
+        score += 10 * ((stats.faction_rep - 1) || 0) * mult;
+        score += 5 * ((stats.hacking_exp - 1) || 0) * mult;
+        score += 5 * ((stats.hacking_growth - 1) || 0) * mult;
+        score += 5 * ((stats.hacking - 1) || 0) * mult;
+        score += 5 * ((stats.hacking_exp - 1) || 0) * mult;
+        score += 10 * ((stats.hacking_speed - 1) || 0) * mult;
+        score += 0.1 * mult;
+        score += (customAugmentWeights[aug] || 0) * mult;
     }
+    // ns.tprint(`${faction} score: ${score}`);
     return score;
 }
 
@@ -115,6 +106,8 @@ async function handlePlayerState(ns)
     const currentWork = ns.singularity.getCurrentWork();
     const busy = ns.singularity.isBusy();
     const factions = player.factions;
+    if (currentWork !== null &amp;&amp; currentWork.type === "CREATE_PROGRAM")
+        return;
     if (factions.length === 0 &amp;&amp; currentWork === null)
     {
         ns.singularity.applyToCompany("FoodNStuff", "Employee");
@@ -138,73 +131,9 @@ async function handlePlayerState(ns)
     }
 }
 
-
-
-async function handlePotentialPurchases(ns)
-{
-    const moneyThreshold = 0.05; // only buy if the purchase would represent less than 5% of our money
-    const player = ns.getPlayer();
-    const currentMoney = player.money;
-    const moneyAvailable = (currentMoney * moneyThreshold) | 0;
-
-    // tor router
-    if (moneyAvailable >= 200e3)
-    {
-        const alreadyHasTor = player.tor;
-        const res = ns.singularity.purchaseTor();
-        if (res &amp;&amp; !alreadyHasTor)
-            ns.toast(`Purchased TOR router!`, "success");
-    }
-
-    const programs = ns.singularity.getDarkwebPrograms();
-    for (const program of programs)
-    {
-        const price = ns.singularity.getDarkwebProgramCost(program);
-        // ns.tprint(`${program}: ${price}, ${moneyAvailable}`);
-        if (price > moneyAvailable)
-            continue;
-        if (ns.fileExists(program))
-            continue;
-        const res = ns.singularity.purchaseProgram(program);
-        if (res)
-            ns.toast(`Purchased ${program} from DarkWeb`, "info", 6000);
-    }
-
-}
-
-async function handleBackdoors(ns)
-{
-    const player = await ns.getPlayer();
-    for (const route of backdoorRoutes)
-    {
-        const s = await ns.getServer(route[route.length - 1]);
-        const hacking = ns.getHackingLevel();
-        if (hacking >= s.requiredHackingSkill &amp;&amp; !s.backdoorInstalled)
-        {
-            ns.toast(`Attempting to install backdoor on ${s.hostname}`, "info", 6000);
-            for (const server of route)
-            {
-                await ns.singularity.connect(server);
-            }
-            const res = await ns.singularity.installBackdoor();
-            if (res)
-                ns.toast(`Installed backdoor on ${s.hostname}`, "success", 6000);
-            else
-                ns.toast(`Failed to install backdoor on ${s.hostname}`, "error", 6000);
-        }
-    }
-}
-
 export async function main(ns)
 {
-    while (true)
-    {
-        await handleFactionInvites(ns);
-        await handlePlayerState(ns);
-        await handlePotentialPurchases(ns);
-        await handleBackdoors(ns);
-        await ns.sleep(1000);
-    }
+    await handlePlayerState(ns);
 }</code></pre>
         </article>
     </section>
@@ -217,7 +146,7 @@ export async function main(ns)
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Tue Aug 09 2022 20:11:00 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Wed Aug 10 2022 12:49:10 GMT+0000 (Coordinated Universal Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
