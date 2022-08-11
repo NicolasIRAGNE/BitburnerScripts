@@ -1,4 +1,4 @@
-const factionsWhitelist = ["CyberSec", "NiteSec", "The Black Hand", "BitRunners", "Tian Di Hui", "Netburners"]
+const factionsWhitelist = ["CyberSec", "NiteSec", "The Black Hand", "BitRunners", "Tian Di Hui", "Netburners", "Daedalus"]
 
 async function handleFactionInvites(ns)
 {

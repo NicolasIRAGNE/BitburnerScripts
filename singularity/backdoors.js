@@ -1,4 +1,4 @@
-const backdoorTargets = ["CSEC", "avmnite-02h", "I.I.I.I"];
+const backdoorTargets = ["CSEC", "avmnite-02h", "I.I.I.I", "run4theh111z"];
 
 async function get_map_to(ns, from, to, visited)
 {

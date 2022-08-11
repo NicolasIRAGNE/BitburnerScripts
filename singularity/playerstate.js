@@ -1,8 +1,12 @@
 const factionsBlacklist = ["Volhaven", "Tetrads"];
 const factionFavorThreshold = 150;
-const augmentationRepThreshold = 175000;
+const augmentationRepThreshold = 1e6;
 const customAugmentWeights = {
     "CashRoot Starter Kit": 100
+}
+
+const customFactionWeights = {
+    // "Daedalus": 40,
 }
 
 function shouldWorkForFaction(ns, faction)
@@ -10,8 +14,8 @@ function shouldWorkForFaction(ns, faction)
     let augmentations = ns.singularity.getAugmentationsFromFaction(faction);
     if (factionsBlacklist.includes(faction))
         return false;
-    if (ns.singularity.getFactionFavor(faction) + ns.singularity.getFactionFavorGain(faction) >= factionFavorThreshold)
-        return false;
+    // if (ns.singularity.getFactionFavor(faction) + ns.singularity.getFactionFavorGain(faction) >= factionFavorThreshold)
+    //     return false;
     const ownedAugmentations = ns.singularity.getOwnedAugmentations();
     augmentations = augmentations.filter(a => !ownedAugmentations.includes(a)
         && ns.singularity.getAugmentationRepReq(a) > ns.singularity.getFactionRep(faction)
@@ -33,6 +37,7 @@ function augmentScore(faction)
     const ownedAugmentations = ns.singularity.getOwnedAugmentations();
     const rep = ns.singularity.getFactionRep(faction);
     const favor = ns.singularity.getFactionFavor(faction);
+    const potentialFavor = favor + ns.singularity.getFactionFavorGain(faction);
     augs = augs.filter(a => !ownedAugmentations.includes(a)
         && ns.singularity.getAugmentationRepReq(a) > rep
         && ns.singularity.getAugmentationRepReq(a) <= augmentationRepThreshold)
@@ -42,10 +47,20 @@ function augmentScore(faction)
         const stats = ns.singularity.getAugmentationStats(aug);
         const repReq = ns.singularity.getAugmentationRepReq(aug);
         if (rep >= repReq)
+        {
+            ns.tprint(`${aug} is owned`);
             break;
+        }
         // the further rep is from repReq, the lower the score
         const dist = Math.abs(rep - repReq);
-        const mult = (1 - dist / augmentationRepThreshold) * (repReq / 10000) * (rep / repReq) * (1 + favor / 100);
+        // get a multiplier such as the closer we are to the requirement, the higher the score, exponentially
+        let mult = (repReq / 10000) * (rep / repReq) * ((1 + favor / 100) * (potentialFavor < factionFavorThreshold ? 1 : 0.1));
+        let distMult = Math.pow(1 - dist / repReq, 3);
+        mult *= distMult;
+        // ns.tprint(`Distance mult for ${aug}: ${distMult}`);
+        score += mult;
+        if (faction in customFactionWeights)
+            mult *= customFactionWeights[faction];
         // ns.tprint(`Mult for ${faction}'s ${aug}: ${mult}`);
         // ns.tprint(`${JSON.stringify(stats)} ${repReq} ${dist} ${mult}`);
         score += 10 * ((stats.faction_rep - 1) || 0) * mult;
@@ -56,7 +71,7 @@ function augmentScore(faction)
         score += 10 * ((stats.hacking_speed - 1) || 0) * mult;
         score += 15 * ((stats.faction_rep - 1) || 0) * mult;
         score += (customAugmentWeights[aug] || 0) * mult;
-        score += 0.01 * mult;
+        // score += 0.01 * mult;
     }
     // ns.tprint(`${faction} score: ${score}`);
     return score;

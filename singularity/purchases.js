@@ -43,7 +43,7 @@ async function handlePotentialPurchases(ns)
     const player = ns.getPlayer();
     const currentMoney = getSpendableMoney(ns);
     const moneyAvailable = (currentMoney * moneyThreshold) | 1;
-    ns.tprint(`money available: ${moneyAvailable}`);
+    // ns.tprint(`money available: ${moneyAvailable}`);
     // tor router
     if (moneyAvailable >= 200e3)
     {
