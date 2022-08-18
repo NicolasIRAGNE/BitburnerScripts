@@ -6,6 +6,12 @@
 import * as lib from "./lib/lib.js";
 import * as wm from "./lib/workload_manager.js";
 import * as t from "./lib/testing.js";
+import * as ports from "/lib/ports.js";
+
+let grownumber = 10;
+let hacknumber = 20;
+let weakennumber = grownumber * 0.2 + hacknumber * 0.2;
+const sharenumber = 1;
 
 async function backdoor(ns, hostname)
 {
@@ -104,19 +110,30 @@ async function generate_batch(ns, host, prep = false)
     return batch;
 }
 
-const grownumber = 600;
-const hacknumber = 150;
-const weakennumber = grownumber * 0.2 + hacknumber * 0.2;
-
 const singularityTasks = [
     "/singularity/backdoors.js",
     "/singularity/factions.js",
-    // "/singularity/hacknet.js",
+    "/singularity/hacknet.js",
     "/singularity/playerstate.js",
     "/singularity/purchases.js",
 ]
 
 const mostExpensiveSingularityTask = async (ns) => { let max = 0; for (let task of singularityTasks) { let cost = await ns.getScriptRam(task); if (cost > max) { max = cost; } } return max; }
+
+async function assignShareTask(ns, manager)
+{
+    const port = ns.getPortHandle(ports.share);
+    const status = port.peek();
+    if (status !== 1)
+    {
+        const task = new wm.Task(ns, "/slaves/share.js", sharenumber);
+        task.dependencies = ["/lib/ports.js"];
+        task.policy = { forbidden_types: lib.HostType.NON_OWN | lib.HostType.HOME };
+        let pow = await t.prof(manager.assign, manager, task, true);
+        ns.print(`Assigned share task with power ${pow}`);
+    }
+
+}
 
 export async function main(ns)
 {
@@ -152,7 +169,7 @@ export async function main(ns)
     // Filter out the targets that have no money to hack
     targets = targets.filter(function (host) { return host.moneyMax > 0; });
 
-    const whitelist = ["4sigma", "joesguns"];
+    const whitelist = ["jjjj"];
     // targets = targets.filter(function (host) { return whitelist.indexOf(host.name) !== -1; });
 
 
@@ -169,10 +186,10 @@ export async function main(ns)
     let manager = await wm.createWorkloadManager(ns);
     ns.atExit(() =>
     {
-        ns.tprint("Exiting...");
+        // ns.tprint("Exiting...");
         t.printReport(ns);
         // lib.printReport();
-        manager.printReport();
+        // manager.printReport();
     });
     await ns.tprint("Updating network...\n");
     await ns.sleep(100);
@@ -200,37 +217,49 @@ export async function main(ns)
     let singularityTaskIndex = 0;
     const mostExpensiveSingularityTaskCost = await mostExpensiveSingularityTask(ns);
     let processed = [];
-    const ramCost = new wm.Task(ns, "/slaves/grow.js", grownumber).powerNeeded
-    + new wm.Task(ns, "/slaves/weaken.js", weakennumber).powerNeeded
-    + new wm.Task(ns, "/slaves/hack_if_full.js", hacknumber).powerNeeded
-    + 1;
+
+    const growCost = new wm.Task(ns, "/slaves/grow.js", 1).cost;
+    const weakenCost = new wm.Task(ns, "/slaves/weaken.js", 1).cost;
+    const hackCost = new wm.Task(ns, "/slaves/hack_if_full.js", 1).cost;
+    const ramCost = growCost + weakenCost + hackCost;
     while (true)
     {
-        // let timer_start = Date.now();
+        let ram = await manager.get_total_ram();
+        hacknumber = ram / (targets.length * hackCost) / 3;
+        // ns.tprint(`${ram} RAM available, ${hacknumber} hacks per target (${hackCost} per target)\n`);
+        hacknumber = Math.floor(hacknumber);
+        ram = ram - (hacknumber * hackCost);
+        grownumber = ram / (targets.length * growCost) / 1;
+        grownumber = Math.floor(grownumber);
+        ram = ram - (grownumber * growCost);
+        weakennumber = grownumber * 0.2 + hacknumber * 0.2;
+        let timer_start = Date.now();
         if (tick % 100 === 0)
         {
+            await assignShareTask(ns, manager);
             let task = new wm.Task(ns, singularityTasks[singularityTaskIndex], 1);
-            // task.policy = { forbidden_types: lib.HostType.HOME };
+            task.policy = { no_args: true };
             let singularityTimerStart = Date.now();
-            while (await t.prof(manager.assign, manager, task) < task.powerNeeded && Date.now() - singularityTimerStart < 3000)
+            if (manager.maxCost > task.cost)
             {
-                // ns.toast(`Could not assign enough power to ${task.script} (${task.powerNeeded})`, "error", 1000);
-                await ns.sleep(1);
+                while (await t.prof(manager.assign, manager, task) < task.powerNeeded && Date.now() - singularityTimerStart < 10000)
+                {
+                    // ns.toast(`Could not assign enough power to ${task.script} (${task.powerNeeded})`, "error", 1000);
+                    await ns.sleep(1);
+                }
+                await t.prof(manager.update_network, manager);
+                let singularityTimerEnd = Date.now();
+                if (singularityTimerEnd - singularityTimerStart > 1000)
+                    ns.toast(`Waited ${singularityTimerEnd - singularityTimerStart}ms for singularity task ${singularityTasks[singularityTaskIndex]}`, "info", 1000);
             }
-            await t.prof(manager.update_network, manager);
-            let singularityTimerEnd = Date.now();
             singularityTaskIndex = (singularityTaskIndex + 1) % singularityTasks.length;
-            if (singularityTimerEnd - singularityTimerStart > 1000)
-                ns.toast(`Waited ${singularityTimerEnd - singularityTimerStart}ms for singularity task ${singularityTasks[singularityTaskIndex]}`, "info", 1000);
+
         }
         if (tick % 1000 === 0)
         {
             try
             {
                 await t.prof(manager.update_network, manager);
-                targets = all_hosts.filter(function (host) { return lib.own_servers.indexOf(host.name) === -1; });
-                targets = targets.filter(function (host) { return host.canHack && host.hasRootAccess; });
-                targets = targets.filter(function (host) { return host.moneyMax > 0; });
             }
             catch (e)
             {
@@ -261,7 +290,7 @@ export async function main(ns)
             {
                 continue;
             }
-            if (ns.getWeakenTime(target.name) > 1000 * 60 * 100)
+            if (ns.getWeakenTime(target.name) > 1000 * 60 * 6)
             {
                 continue;
             }
@@ -286,8 +315,8 @@ export async function main(ns)
             let growtask = new wm.Task(ns, "/slaves/grow.js", grownumber, target.name);
             let weakentask = new wm.Task(ns, "/slaves/weaken.js", weakennumber, target.name);
             let hacktask = new wm.Task(ns, "/slaves/hack_if_full.js", hacknumber, target.name);
-            hacktask.policy = { forbidden_types: lib.HostType.HOME };
-            let batch = new wm.Batch(ns, [growtask, weakentask, hacktask]);
+            // hacktask.policy = { forbidden_types: lib.HostType.HOME };
+            let batch = new wm.Batch(ns, [hacktask, weakentask, growtask]);
             if (await t.prof(manager.get_available_ram, manager) < batch.cost)
             {
                 // ns.toast(`Could not assign enough power to ${target.name} (${await manager.get_available_ram()}/${batch.cost})\n`, "error");
@@ -296,7 +325,7 @@ export async function main(ns)
             let pow = 0;
             try
             {
-                pow =  await t.prof(manager.assign, manager, batch);
+                pow = await t.prof(manager.assign, manager, batch);
 
             }
             catch (e)
@@ -307,7 +336,7 @@ export async function main(ns)
             {
                 // await ns.tprint(`Could not assign enough power to ${target.name} (${pow}/${batch.powerNeeded})\n`);
             }
-            target.busyUntil = Date.now() + ns.getWeakenTime(target.name) / 2;
+            target.busyUntil = Date.now() + ns.getWeakenTime(target.name) / 1;
             if (!processed.includes(target.name))
             {
                 processed.push(target.name);
@@ -324,11 +353,13 @@ export async function main(ns)
             await ns.toast(`${await t.prof(manager.summary, manager)} (${skipped} / ${targets.length} skipped)`, "info", 4000);
             processed = [];
         }
-        
+
         await ns.sleep(1);
         tick++;
-        // let timer_end = Date.now();
-        // await ns.tprint(`Tick ${tick} in ${timer_end - timer_start}ms (${skipped} skipped)\n`);
+        let timer_end = Date.now();
+        const diff = timer_end - timer_start;
+        if (diff > 100)
+            await ns.print(`Tick ${tick} took ${timer_end - timer_start}ms\n`);
         // return;
     }
 }

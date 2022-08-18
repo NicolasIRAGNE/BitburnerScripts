@@ -1,13 +1,4 @@
-const backdoorTargets = ["CSEC",
- "avmnite-02h",
- "I.I.I.I",
- "run4theh111z",
- "The-Cave",
- "w0r1d_d43m0n",
- "fulcrumassets",
- "rothman-uni",
- "powerhouse-fitness"
-];
+import * as lib from "./lib/lib.js";
 
 async function get_map_to(ns, from, to, visited)
 {
@@ -34,16 +25,30 @@ async function get_map_to(ns, from, to, visited)
     return [];
 }
 
-async function handleBackdoors(ns)
+async function backdoor(ns, hostname)
 {
-    if (ns.singularity.getCurrentServer() !== "home")
-        return;
-    for (const target of backdoorTargets)
+    if (ns.getServer(hostname).requiredHackingSkill <= await ns.getHackingLevel())
     {
-        const s = await ns.getServer(target);
+        await ns.singularity.connect(hostname);
+        const res = await ns.singularity.installBackdoor(hostname);
+		if (res)
+			ns.tprint(`Backdoor on ${hostname} successful`);
+    }
+}
+
+export async function main(ns)
+{
+    await lib.init(ns);
+    let hosts = [];
+    await lib.recurse_scan(ns, "home", hosts, [lib.try_nuke]);
+    for (const target of hosts)
+    {
+        if (target.backdoorInstalled)
+            continue;
+        const s = await ns.getServer(target.name);
         const hacking = ns.getHackingLevel();
-        let route = await get_map_to(ns, ns.getHostname(), target);
-        if (hacking >= s.requiredHackingSkill && !s.backdoorInstalled && ns.hasRootAccess(target))
+        let route = await get_map_to(ns, ns.getHostname(), target.name);
+        if (hacking >= s.requiredHackingSkill && !s.backdoorInstalled && ns.hasRootAccess(target.name))
         {
             ns.toast(`Attempting to install backdoor on ${s.hostname}`, "info", 6000);
             for (const server of route)
@@ -61,9 +66,4 @@ async function handleBackdoors(ns)
             await ns.singularity.connect("home");
         }
     }
-}
-
-export async function main(ns)
-{
-    await handleBackdoors(ns);
 }

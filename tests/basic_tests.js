@@ -46,7 +46,6 @@ export async function run_tests(ns)
     good();
     await t.prof(wait, null, ns, 10);
     await t.prof(wait, null, ns, 100);
-    await t.prof(ns.tprint, ns, "Hello");
 }
 
 export async function main(ns)

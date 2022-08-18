@@ -64,6 +64,7 @@ async function handlePotentialPurchases(ns)
             ns.toast(`Purchased ${program} from DarkWeb`, "info", 6000);
     }
     let affordableRamAmount = affordableRam(ns, moneyAvailable);
+    // ns.tprint(`affordableRamAmount: ${affordableRamAmount}`);
     if (affordableRamAmount > 2)
     {
         if (ns.getPurchasedServers().length >= ns.getPurchasedServerLimit())
@@ -73,6 +74,12 @@ async function handlePotentialPurchases(ns)
         const res = ns.purchaseServer("rob", affordableRamAmount);
         if (res)
             ns.toast(`Purchased ${affordableRamAmount} RAM`, "success", 6000);
+    }
+    if (moneyAvailable >= ns.singularity.getUpgradeHomeRamCost())
+    {
+        const res = ns.singularity.upgradeHomeRam();
+        if (res)
+            ns.toast(`Upgraded home ram`, "success", 6000);
     }
 
 }
