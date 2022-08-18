@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Batch - Documentation</title>
+    <title>contracts/algorithmic_stock_trader_2.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,425 +29,49 @@
 
 <div id="main">
     
-    <h1 class="page-title">Batch</h1>
+    <h1 class="page-title">contracts/algorithmic_stock_trader_2.js</h1>
     
 
     
 
 
 
-
-<section>
-
-<header>
-    
-        <h2>
-        Batch
-        </h2>
-        
-            <div class="class-description">A Batch is simply a collection of <a href="Task.html">Task</a>s that can be assigned at the same time.
-This is mostly for convenience and adding a layer of abstraction in cases where we have a lot of tasks to assign.
-A Batch is also a Task, so it is possible to make Batches of Batches. Matryoshka?
-Note that batching tasks does NOT mean that the tasks will be executed on the same node, nor that the tasks will be executed sequentially.</div>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-<div class="section-method">
-
-    
-    <h2>Constructor</h2>
-    
-
-    <h4 class="name" id="Batch"><span class="type-signature"></span>new Batch<span class="signature">(ns, tasks)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>tasks</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>tasks</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The tasks in the batch.</td>
-        </tr>
-
-        
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_workload_manager.js.html">lib/workload_manager.js</a>, <a href="lib_workload_manager.js.html#line75">line 75</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>ns</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>NS</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                The NetScript instance
-                
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>tasks</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>Array.&lt;<a href="Task.html">Task</a>></code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                The initial tasks to add to the batch. Further tasks need to be added using the Batch.add method.
-                
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
-    
-    </div>
-
-    
-        <h3 class="subsection-title">Extends</h3>
-
-        
-
-
-    <ul>
-        <li><a href="Task.html">Task</a></li>
-    </ul>
-
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="Batch.html">Batch</a></dt>
-            <dd></dd>
-        </dl>
-    
-
-     
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-<div class="section-method">
-
-    
-
-    <h4 class="name" id="add"><span class="type-signature"></span>add<span class="signature">(task)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    Adds a task to the batch. This will update the cost of the batch.
-</div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ *  You are attempting to solve a Coding Contract. You have 10 tries remaining, after which the contract will self-destruct.
 
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_workload_manager.js.html">lib/workload_manager.js</a>, <a href="lib_workload_manager.js.html#line94">line 94</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
+    You are given the following array of stock prices (which are numbers) where the i-th element represents the stock price on day i:
 
-        
+    136,100,103,155,112,41,75,120,35,187
 
-        <th class="last">Description</th>
-    </tr>
-    </thead>
+    Determine the maximum possible profit you can earn using as many transactions as you'd like. A transaction is defined as buying and then selling one share of the stock. Note that you cannot engage in multiple transactions at once. In other words, you must sell the stock before you buy it again.
 
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>task</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code><a href="Task.html">Task</a></code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                
-                
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
+    If no profit can be made, then the answer should be 0
+ */
 
-
-
-
-
-
-
-
-
-
-
-</div>
-        
-    
-
-    
-
-    
-</article>
+export async function main(ns)
+{
+    const prices = [136, 100, 103, 155, 112, 41, 75, 120, 35, 187];
+    const profit = getProfit(prices);
+    ns.tprint(`The maximum profit is ${profit}`);
+}
 
-</section>
+function getProfit(prices)
+{
+    let profit = 0;
+    for (let i = 1; i &lt; prices.length; i++)
+    {
+        if (prices[i] > prices[i - 1])
+        {
+            profit += prices[i] - prices[i - 1];
+        }
+    }
+    return profit;
+}</code></pre>
+        </article>
+    </section>
 
 
 
@@ -457,7 +81,7 @@ Note that batching tasks does NOT mean that the tasks will be executed on the sa
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Thu Aug 18 2022 16:43:08 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Thu Aug 18 2022 16:43:07 GMT+0000 (Coordinated Universal Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

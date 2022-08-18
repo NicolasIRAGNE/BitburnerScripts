@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Batch - Documentation</title>
+    <title>contracts/unique_paths_2.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,425 +29,94 @@
 
 <div id="main">
     
-    <h1 class="page-title">Batch</h1>
-    
-
-    
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>
-        Batch
-        </h2>
-        
-            <div class="class-description">A Batch is simply a collection of <a href="Task.html">Task</a>s that can be assigned at the same time.
-This is mostly for convenience and adding a layer of abstraction in cases where we have a lot of tasks to assign.
-A Batch is also a Task, so it is possible to make Batches of Batches. Matryoshka?
-Note that batching tasks does NOT mean that the tasks will be executed on the same node, nor that the tasks will be executed sequentially.</div>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-<div class="section-method">
-
-    
-    <h2>Constructor</h2>
-    
-
-    <h4 class="name" id="Batch"><span class="type-signature"></span>new Batch<span class="signature">(ns, tasks)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>tasks</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>tasks</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The tasks in the batch.</td>
-        </tr>
-
-        
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_workload_manager.js.html">lib/workload_manager.js</a>, <a href="lib_workload_manager.js.html#line75">line 75</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>ns</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>NS</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                The NetScript instance
-                
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>tasks</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>Array.&lt;<a href="Task.html">Task</a>></code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                The initial tasks to add to the batch. Further tasks need to be added using the Batch.add method.
-                
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
-    
-    </div>
-
-    
-        <h3 class="subsection-title">Extends</h3>
-
-        
-
-
-    <ul>
-        <li><a href="Task.html">Task</a></li>
-    </ul>
-
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="Batch.html">Batch</a></dt>
-            <dd></dd>
-        </dl>
-    
-
-     
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-<div class="section-method">
-
-    
-
-    <h4 class="name" id="add"><span class="type-signature"></span>add<span class="signature">(task)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    Adds a task to the batch. This will update the cost of the batch.
-</div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_workload_manager.js.html">lib/workload_manager.js</a>, <a href="lib_workload_manager.js.html#line94">line 94</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>task</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code><a href="Task.html">Task</a></code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                
-                
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
-        
-    
-
-    
-
-    
-</article>
-
-</section>
+    <h1 class="page-title">contracts/unique_paths_2.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * You are located in the top-left corner of the following grid:
+
+    0,0,1,0,0,1,0,1,1,0,
+    0,0,0,0,0,0,0,0,0,0,
+    0,0,0,1,0,0,0,0,0,0,
+    1,0,1,0,0,0,0,0,0,0,
+    0,0,1,0,0,0,0,1,0,0,
+    0,0,0,0,0,0,0,1,0,1,
+    0,0,0,1,0,0,0,0,0,0,
+    1,0,0,1,0,1,0,0,0,0,
+    1,0,0,0,1,0,0,0,0,0,
+
+    You are trying reach the bottom-right corner of the grid, but you can only move down or right on each step. Furthermore, there are obstacles on the grid that you cannot move onto. These obstacles are denoted by '1', while empty spaces are denoted by 0.
+
+    Determine how many unique paths there are from start to finish.
+ */
+
+export async function main(ns)
+{
+    const grid = [
+        [0,0,1,0,0,1,0,1,1,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,1,0,0,0,0,0,0],
+        [1,0,1,0,0,0,0,0,0,0],
+        [0,0,1,0,0,0,0,1,0,0],
+        [0,0,0,0,0,0,0,1,0,1],
+        [0,0,0,1,0,0,0,0,0,0],
+        [1,0,0,1,0,1,0,0,0,0],
+        [1,0,0,0,1,0,0,0,0,0],
+    ];
+    const start = [0, 0];
+    const end = [grid.length - 1, grid[0].length - 1];
+    const paths = getPaths(grid, start, end);
+    ns.tprint(`There are ${paths} unique paths from ${start} to ${end}`);
+}
+
+function getPaths(grid, start, end)
+{
+    const paths = [];
+    const path = [];
+    const visited = [];
+    for (let i = 0; i &lt; grid.length; i++)
+    {
+        visited[i] = [];
+        for (let j = 0; j &lt; grid[0].length; j++)
+        {
+            visited[i][j] = false;
+        }
+    }
+    getPath(grid, start, end, path, paths, visited);
+    return paths.length;
+}
+
+function getPath(grid, start, end, path, paths, visited)
+{
+    if (start[0] &lt; 0 || start[0] >= grid.length || start[1] &lt; 0 || start[1] >= grid[0].length)
+        return;
+    if (visited[start[0]][start[1]])
+        return;
+    if (grid[start[0]][start[1]] === 1)
+        return;
+    path.push(start);
+    visited[start[0]][start[1]] = true;
+    if (start[0] === end[0] &amp;&amp; start[1] === end[1])
+    {
+        paths.push(path.slice());
+    }
+    else
+    {
+        getPath(grid, [start[0] + 1, start[1]], end, path, paths, visited);
+        getPath(grid, [start[0], start[1] + 1], end, path, paths, visited);
+    }
+    path.pop();
+    visited[start[0]][start[1]] = false;
+}</code></pre>
+        </article>
+    </section>
 
 
 
@@ -457,7 +126,7 @@ Note that batching tasks does NOT mean that the tasks will be executed on the sa
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Thu Aug 18 2022 16:43:08 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Thu Aug 18 2022 16:43:07 GMT+0000 (Coordinated Universal Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
