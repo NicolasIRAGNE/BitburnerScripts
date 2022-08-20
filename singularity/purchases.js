@@ -45,11 +45,10 @@ async function handlePotentialPurchases(ns)
     const moneyAvailable = (currentMoney * moneyThreshold) | 1;
     // ns.tprint(`money available: ${moneyAvailable}`);
     // tor router
-    if (moneyAvailable >= 200e3)
+    if (moneyAvailable * 10 >= 200e3)
     {
-        const alreadyHasTor = player.tor;
         const res = ns.singularity.purchaseTor();
-        if (res && !alreadyHasTor)
+        if (res && !player.tor)
             ns.toast(`Purchased TOR router!`, "success");
     }
 

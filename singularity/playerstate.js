@@ -10,7 +10,7 @@ const factionsBlacklist = [
     "Shadows of Anarchy"
 ];
 const factionFavorThreshold = 150;
-const augmentationRepThreshold = 18e3;
+const augmentationRepThreshold = 2e6;
 const customAugmentWeights = {
     "CashRoot Starter Kit": 100,
     "Neuroreceptor Management Implant": 1e3,
@@ -37,11 +37,11 @@ const megacorporations =
 
 let augmentCounts = {};
 
-const targetCharisma = 100;
-const targetStrength = 50;
-const targetDefense = 50;
-const targetDexterity = 50;
-const targetAgility = 50;
+const targetCharisma = 10;
+const targetStrength = 5;
+const targetDefense = 5;
+const targetDexterity = 5;
+const targetAgility = 5;
 
 const agility =
 {
@@ -92,15 +92,15 @@ const statWeights =
     hacking_money: 20,
     hacking_grow: 22,
     hacking: 20,
-    hacking_exp: 50,
-    strength: 3,
-    strength_exp: 3,
-    defense: 3,
-    defense_exp: 3,
-    dexterity: 3,
-    dexterity_exp: 3,
-    agility: 3,
-    agility_exp: 3,
+    hacking_exp: 120,
+    strength: 2,
+    strength_exp: 2,
+    defense: 2,
+    defense_exp: 2,
+    dexterity: 2,
+    dexterity_exp: 2,
+    agility: 2,
+    agility_exp: 2,
     charisma: 7,
     charisma_exp: 7,
     hacknet_node_money: 1,
@@ -138,8 +138,8 @@ function shouldWorkForFaction(ns, faction)
 
 function shouldWorkForCompany(ns, player, company)
 {
-    // const rep = ns.singularity.getCompanyRep(company);
-    const rep = 0; // temporary
+    const rep = ns.singularity.getCompanyRep(company);
+    // const rep = 0; // temporary
     const factions = player.factions.filter((faction) => factionsBlacklist.indexOf(faction) === -1);
 
     if (factions.includes(company) || rep >= 400000)
@@ -179,11 +179,13 @@ function augmentScore(faction)
         // the further rep is from repReq, the lower the score
         // ns.tprint(`Calculations details: ${aug} repReq: ${repReq} rep: ${rep} favor: ${favor} potentialFavor: ${potentialFavor} mult: ${mult}`);
         const dist = Math.abs(rep - repReq);
-        let mult = (repReq / 1000) * ((rep + 1000) / repReq) * ((1 + favor / 10000) * (potentialFavor < factionFavorThreshold ? 10000 : 1));
-        let distMult = 1 + Math.pow(1 - dist / repReq, 4) * 10;
+        let mult = (repReq / 3000) * ((rep + 1000) / repReq) * ((1 + favor / 10000) * (potentialFavor < factionFavorThreshold ? 1000 : 1));
+        let distMult = 1 + Math.pow(1 - dist / repReq, 2) * 100;
+        let isUnique = false;
         if (augmentCounts[aug] <= 1) // augmentation is available in only one faction
         {
             mult *= distMult;
+            isUnique = true;
         }
         else
         {
@@ -197,6 +199,7 @@ function augmentScore(faction)
             if (stat in statWeights)
             {
                 augScore += (augStats[stat] - 1) * statWeights[stat] * mult;
+                // ns.tprint(`${aug} has ${augStats[stat]} ${stat} and adds ${(augStats[stat] - 1) * statWeights[stat] * mult} to score`);
                 // if (faction === "ECorp" || faction === "Illuminati")
                 //     ns.tprint(`${aug} has stat ${stat} with value ${augStats[stat]} and weight ${statWeights[stat]} and mult ${mult}`);
             }
@@ -207,7 +210,7 @@ function augmentScore(faction)
         }
         // augScore += 0.00001 * mult;
         // if (faction === "Tetrads" || faction === "The Syndicate")
-        // ns.tprint(`${aug} has score ${augScore}`);
+        // ns.tprint(`${faction} ${aug} has score ${augScore} (mult: ${mult} * ${isUnique ? distMult : 1})`);
         score += augScore;
     }
     return score;
@@ -234,30 +237,30 @@ let _ns = null;
 
 async function handleStats(ns, player)
 {
-    // for (const stat of stats)
-    // {
-    //     if (player.skills[stat.name] < stat.target)
-    //     {
-    //         if (state === stat.name)
-    //             return true;
-    //         let res = false;
-    //         if (stat.place.includes("University"))
-    //             res = ns.singularity.universityCourse(stat.place, stat.course, false);
-    //         if (stat.place.includes("Gym"))
-    //             res = ns.singularity.gymWorkout(stat.place, stat.course, false);
-    //         if (res)
-    //         {
-    //             state = stat.name;
-    //             ns.toast(`Started training ${stat.course} at ${stat.place}`);
-    //             return true;
-    //         }
-    //         else
-    //         {
-    //             ns.toast(`Could not start training ${stat.course} at ${stat.place}`, "error");
-    //         }
-    //     }
-    // }
-    // return false;
+    for (const stat of stats)
+    {
+        if (player.skills[stat.name] < stat.target)
+        {
+            if (state === stat.name)
+                return true;
+            let res = false;
+            if (stat.place.includes("University"))
+                res = ns.singularity.universityCourse(stat.place, stat.course, false);
+            if (stat.place.includes("Gym"))
+                res = ns.singularity.gymWorkout(stat.place, stat.course, false);
+            if (res)
+            {
+                state = stat.name;
+                ns.toast(`Started training ${stat.course} at ${stat.place}`);
+                return true;
+            }
+            else
+            {
+                ns.toast(`Could not start training ${stat.course} at ${stat.place}`, "error");
+            }
+        }
+    }
+    return false;
 }
 
 async function handlePlayerState(ns)
@@ -269,15 +272,15 @@ async function handlePlayerState(ns)
     {
         state = "none";
     }
-    // const busy = ns.singularity.isBusy();
-    // let s = await handleStats(ns, player);
-    // if (s)
-    //     return;
-    // if (currentWork !== null && currentWork.type === "CREATE_PROGRAM")
-    // {
-    //     state = "program";
-    //     return;
-    // }
+    const busy = ns.singularity.isBusy();
+    let s = await handleStats(ns, player);
+    if (s)
+        return;
+    if (currentWork !== null && currentWork.type === "CREATE_PROGRAM")
+    {
+        state = "program";
+        return;
+    }
     getAugmentCounts(ns, factions);
     factions.sort((a, b) => augmentScore(b) - augmentScore(a));
     factions = factions.filter((faction) => shouldWorkForFaction(ns, faction));
@@ -287,7 +290,7 @@ async function handlePlayerState(ns)
         let d = ns.singularity.donateToFaction(faction, donateMoney);
         if (d)
             ns.toast(`Donated ${ns.nFormat(donateMoney, "0.00a")} to ${faction}`);
-        // ns.tprint(`${faction} score: ${augmentScore(faction)}`);
+        ns.tprint(`${faction} score: ${augmentScore(faction)}`);
     }
     for (const faction of factions)
     {
@@ -310,28 +313,28 @@ async function handlePlayerState(ns)
             return;
         }
     }
-    // let companies = [...megacorporations];
-    // companies.sort((a, b) => (ns.singularity.getCompanyFavor(b)) - (ns.singularity.getCompanyFavor(a)));
-    // companies.push("FoodNStuff");
-    // for (const company of companies)
-    // {
-    //     if (shouldWorkForCompany(ns, player, company))
-    //     {
-    //         let jobType = megacorporations.includes(company) ? "it" : "Employee";
-    //         let res = ns.singularity.applyToCompany(company, jobType);
-    //         if (res && megacorporations.includes(company))
-    //             ns.toast(`Applied to ${company}`, "success");
-    //         if (currentWork !== null && currentWork.type === "COMPANY" && currentWork.companyName === company)
-    //             break;
-    //         res = ns.singularity.workForCompany(company, false);
-    //         if (res)
-    //         {
-    //             ns.toast(`Started working for ${company}`, "success");
-    //             state = "company";
-    //             return;
-    //         }
-    //     }
-    // }
+    let companies = [...megacorporations];
+    companies.sort((a, b) => (ns.singularity.getCompanyFavor(b)) - (ns.singularity.getCompanyFavor(a)));
+    companies.push("FoodNStuff");
+    for (const company of companies)
+    {
+        if (shouldWorkForCompany(ns, player, company))
+        {
+            let jobType = megacorporations.includes(company) ? "it" : "Employee";
+            let res = ns.singularity.applyToCompany(company, jobType);
+            if (res && megacorporations.includes(company))
+                ns.toast(`Applied to ${company}`, "success");
+            if (currentWork !== null && currentWork.type === "COMPANY" && currentWork.companyName === company)
+                break;
+            res = ns.singularity.workForCompany(company, false);
+            if (res)
+            {
+                ns.toast(`Started working for ${company}`, "success");
+                state = "company";
+                return;
+            }
+        }
+    }
 }
 
 export async function main(ns)
